@@ -1,7 +1,7 @@
-﻿const CACHE_NAME = "futpontos-v18";
+const CACHE_NAME = "futpontos-v19";
 
-// Arquivos que ficam disponíveis offline
 const STATIC_ASSETS = [
+  "/",
   "/index.html",
   "/goleiros.html",
   "/desempenho.html",
@@ -9,9 +9,13 @@ const STATIC_ASSETS = [
   "/topo.html",
   "/videos.html",
   "/jogador.html",
+
   "/classificacao.css",
   "/common-nav.css",
   "/commom-nav.css",
+  "/responsive-mobile.css",
+  "/globais.css",
+
   "/globais.js",
   "/menu.js",
   "/classificacao.js",
@@ -22,119 +26,162 @@ const STATIC_ASSETS = [
   "/topo.js",
   "/videos.js",
   "/jogador.js",
+
   "/futponts_large.png",
+
   "/manifest.json",
   "/sw.js"
 ];
 
-// INSTALL: faz cache dos assets estáticos
+// ===============================
+// INSTALL
+// ===============================
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log("Service Worker: Cacheando arquivos estáticos...");
-      return cache.addAll(STATIC_ASSETS);
-    }).catch(error => {
-      console.warn("Service Worker: Erro ao cachear assets", error);
-    })
-  );
+  console.log("SW: Instalando nova versão...");
+
   self.skipWaiting();
+
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(STATIC_ASSETS);
+      })
+      .catch(err => {
+        console.error("SW: erro install", err);
+      })
+  );
 });
 
-// ACTIVATE: limpa caches antigos
+// ===============================
+// ACTIVATE
+// ===============================
 self.addEventListener("activate", event => {
+  console.log("SW: Ativando nova versão...");
+
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => {
-            console.log("Service Worker: Deletando cache antigo:", key);
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log("SW: removendo cache antigo:", key);
             return caches.delete(key);
-          })
+          }
+        })
       );
     })
   );
+
   self.clients.claim();
 });
 
-// FETCH: estratégia por tipo de recurso
+// ===============================
+// FETCH
+// ===============================
 self.addEventListener("fetch", event => {
-  const url = new URL(event.request.url);
-  const pathname = url.pathname;
+  const request = event.request;
 
-  // Ignorar requisições não-GET
-  if (event.request.method !== "GET") {
+  // Apenas GET
+  if (request.method !== "GET") {
     return;
   }
 
-  // Chamadas de API: network first, sem fallback de cache
+  const url = new URL(request.url);
+
+  // ===============================
+  // HTML → NETWORK FIRST
+  // evita menu/site antigo
+  // ===============================
   if (
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/jogadores") ||
-    pathname.startsWith("/goleiros") ||
-    pathname.startsWith("/desempenho") ||
-    url.hostname !== self.location.hostname
+    request.headers.get("accept")?.includes("text/html")
   ) {
     event.respondWith(
-      fetch(event.request)
+      fetch(request)
         .then(response => {
-          // Cache bem-sucedido para próximas requisições
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, clone);
-            });
-          }
+          const clone = response.clone();
+
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, clone);
+          });
+
           return response;
         })
         .catch(() => {
-          // API offline: tenta cache, se não houver retorna JSON vazio
-          return caches.match(event.request).then(cached => {
-            return cached || new Response(JSON.stringify([]), {
-              status: 200,
-              statusText: "OK",
-              headers: { "Content-Type": "application/json" }
+          return caches.match(request)
+            .then(cached => {
+              return cached || caches.match("/index.html");
             });
-          });
         })
     );
+
     return;
   }
 
-  // Assets estáticos: cache first, fallback network
-  event.respondWith(
-    caches.match(event.request)
-      .then(cached => {
-        if (cached) {
-          return cached;
-        }
+  // ===============================
+  // APIs → NETWORK FIRST
+  // ===============================
+  if (
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/jogadores") ||
+    url.pathname.startsWith("/goleiros") ||
+    url.pathname.startsWith("/desempenho")
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
 
-        return fetch(event.request).then(response => {
-          // Validar resposta
-          if (!response || response.status !== 200 || response.type === "error") {
-            return response;
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, clone);
+            });
           }
 
-          // Atualizar cache com a versão mais recente
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, clone);
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request).then(cached => {
+            return (
+              cached ||
+              new Response(JSON.stringify([]), {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              })
+            );
           });
+        })
+    );
+
+    return;
+  }
+
+  // ===============================
+  // CSS / JS / IMG
+  // CACHE FIRST + UPDATE BACKGROUND
+  // ===============================
+  event.respondWith(
+    caches.match(request).then(cached => {
+
+      const networkFetch = fetch(request)
+        .then(response => {
+
+          if (
+            response &&
+            response.status === 200
+          ) {
+            const clone = response.clone();
+
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, clone);
+            });
+          }
 
           return response;
-        });
-      })
-      .catch(() => {
-        // Fallback para página offline se configurada
-        return caches.match("/index.html");
-      })
+        })
+        .catch(() => cached);
+
+      return cached || networkFetch;
+    })
   );
 });
-
-
-
-
-
-
-
-
