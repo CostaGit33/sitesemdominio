@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    FutPontos • Classificação Geral de Futebol Society
+  </title>
+
+  <!-- SEO -->
+  <meta
+    name="description"
+    content="Ranking visual, classificação geral, estatísticas e desempenho dos jogadores no FutPontos."
+  />
+
+  <meta
+    name="keywords"
+    content="futebol society, ranking futebol, classificação futebol, futpontos, jogadores, desempenho"
+  />
+
+  <meta
+    name="robots"
+    content="index, follow"
+  />
+
+  <link
+    rel="canonical"
+    href="https://semdominio.online/"
+  />
+
+  <!-- OPEN GRAPH -->
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <meta
+    property="og:title"
+    content="FutPontos • Classificação Geral"
+  />
+
+  <meta
+    property="og:description"
+    content="Veja ranking, estatísticas e desempenho dos jogadores."
+  />
+
+  <meta
+    property="og:image"
+    content="https://semdominio.online/futponts_large.png"
+  />
+
+  <!-- PWA -->
+  <link
+    rel="manifest"
+    href="manifest.json"
+  />
+
+  <meta
+    name="theme-color"
+    content="#07080D"
+  />
+
+  <!-- ICONES -->
+  <link
+    rel="icon"
+    href="futponts_large.png"
+    type="image/png"
+  />
+
+  <link
+    rel="apple-touch-icon"
+    href="futponts_large.png"
+  />
+
+  <!-- PERFORMANCE -->
+  <link
+    rel="preconnect"
+    href="https://cdn.jsdelivr.net"
+  />
+
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="common-nav.css"
+  />
+
+  <link
+    rel="stylesheet"
+    href="classificacao.css"
+  />
+
+  <!-- CHART -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/chart.js"
+  ></script>
+
+  <!-- GOOGLE ANALYTICS -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-VVYJFM295R"
+  ></script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+
+    gtag("config", "G-VVYJFM295R");
+  </script>
+
+  <!-- ESTILOS EXTRAS -->
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      /* overflow-x: hidden REMOVIDO — quebrava position:sticky do header e o menu mobile */
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+    }
+
+    .app-main {
+      width: min(1400px, 95%);
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+
+    /* garante que o dropdown do menu fique posicionado corretamente */
+    .app-header {
+      position: relative;
+    }
+
+    /* eleva o z-index do nav para ficar acima de tudo ao abrir */
+    .app-nav.active {
+      z-index: 1100;
+    }
+
+    .loading,
+    .error {
+      text-align: center;
+      padding: 20px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+
+    <div class="brand">
+      <img
+        src="futponts_large.png"
+        class="brand-logo"
+        alt="Logo FutPontos"
+        loading="lazy"
+      />
+    </div>
+
+    <button
+      class="menu-toggle"
+      aria-label="Abrir menu"
+    >
+      ☰
+    </button>
+
+    <nav
+      class="app-nav"
+      aria-label="Navegação principal"
+    >
+
+      <ul>
+        <li>
+          <a
+            href="index.html"
+            class="active"
+          >
+            Classificação
+          </a>
+        </li>
+
+        <li>
+          <a href="goleiros.html">
+            Goleiros
+          </a>
+        </li>
+
+        <li>
+          <a href="desempenho.html">
+            Desempenho
+          </a>
+        </li>
+
+        <li>
+          <a href="analise-semana.html">
+            Análises
+          </a>
+        </li>
+
+        <li>
+          <a href="topo.html">
+            Topos
+          </a>
+        </li>
+
+        <li>
+          <a
+            href="videos.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Vídeos
+          </a>
+        </li>
+      </ul>
+
+    </nav>
+
+  </header>
+
+  <!-- MAIN -->
+  <main class="app-main">
+
+    <!-- TABELA -->
+    <section class="classification-section">
+
+      <header class="section-header">
+        <h1>
+          Classificação Geral Individual
+        </h1>
+      </header>
+
+      <div class="table-wrapper">
+
+        <table
+          aria-label="Tabela de classificação geral dos jogadores"
+        >
+
+          <thead>
+
+            <tr>
+              <th>#</th>
+              <th>JOG</th>
+              <th>P</th>
+              <th>V</th>
+              <th>G</th>
+              <th>DEF</th>
+              <th>EMP</th>
+              <th>INF</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="playerList">
+
+            <tr>
+              <td colspan="8">
+                Carregando classificação...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+
+    <div class="footer-content">
+      <span>
+        © 2026 • FutPontos • semdominio.online
+      </span>
+    </div>
+
+  </footer>
+
+  <!-- MENU -->
+  <script src="menu.js"></script>
+  <script type="module" src="classificacao.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+

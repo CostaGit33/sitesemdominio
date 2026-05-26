@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FutPontos • Topos da Temporada</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="classificacao.css" />
+  <style>
+    .app-main { gap: 1.5rem; }
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .top-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+    .top-card h3 { margin: 0 0 .5rem; color: var(--highlight-color); }
+    .top-name { color: #00ff88; font-weight: 800; font-size: 1.15rem; }
+    .top-value { font-weight: 700; margin-top: .3rem; }
+    .top-value.down { color: #ff6b6b; }
+    .filter-row {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: .8rem;
+    }
+    .filter-row select {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: .45rem .6rem;
+      min-width: 240px;
+    }
+  </style>
+</head>
+<body>
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="analise-semana.html">Análises</a></li>
+        <li><a href="topo.html" class="active">Topos</a></li>
+        <li><a href="videos.html" target="_blank" rel="noopener noreferrer">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section class="classification-section">
+      <header class="section-header"><h1>Topos da Semana</h1></header>
+      <div class="top-grid">
+        <article class="top-card">
+          <h3>Top Evolução</h3>
+          <div id="topUpName" class="top-name">Sem dados</div>
+          <div id="topUpValue" class="top-value">+0 pontos</div>
+        </article>
+        <article class="top-card">
+          <h3>Top Queda</h3>
+          <div id="topDownName" class="top-name">Sem dados</div>
+          <div id="topDownValue" class="top-value down">0 pontos</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="classification-section">
+      <header class="section-header"><h2>Linha do Tempo por Jogador</h2></header>
+      <div class="filter-row">
+        <label for="playerFilter">Jogador</label>
+        <select id="playerFilter"></select>
+      </div>
+      <div class="table-wrapper">
+        <table aria-label="Linha do tempo de deltas por jogador">
+          <thead><tr><th>Data/Hora</th><th>Período</th><th>Delta</th></tr></thead>
+          <tbody id="timelineBody"><tr><td colspan="3">Sem eventos ainda.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="classification-section">
+      <header class="section-header"><h2>Hall da Temporada</h2></header>
+      <div class="table-wrapper">
+        <table aria-label="Hall da temporada por liderança de períodos">
+          <thead><tr><th>#</th><th>Jogador</th><th>Líder Semanal</th><th>Líder Mensal</th><th>Total</th></tr></thead>
+          <tbody id="hallBody"><tr><td colspan="5">Sem dados ainda.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content"><span>© 2026 • FutPontos • semdominio.online</span></div>
+  </footer>
+
+  <script src="menu.js"></script>
+  <script type="module" src="topo.js"></script>
+</body>
+</html>
+

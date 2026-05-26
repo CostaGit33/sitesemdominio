@@ -1,0 +1,496 @@
+/* ======================================================
+   RESPONSIVO MOBILE - PADRÃO OTIMIZADO
+   Aplicar essas regras para melhorar mobile
+====================================================== */
+
+/* ── VARIÁVEIS GLOBAIS ──────────────────────────── */
+:root {
+  /* Espaçamento fluído */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Breakpoints */
+  --breakpoint-sm: 360px;   /* Mobile pequeno */
+  --breakpoint-md: 480px;   /* Mobile padrão */
+  --breakpoint-lg: 768px;   /* Tablet */
+  --breakpoint-xl: 1024px;  /* Desktop pequeno */
+  --breakpoint-2xl: 1400px; /* Desktop grande */
+}
+
+/* ── RESET MOBILE FIRST ──────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px; /* Respeitar preferência do user */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── TIPOGRAFIA RESPONSIVA ──────────────────────────── */
+h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 4vw, 2rem);
+}
+
+h3 {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+}
+
+p, span {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+/* ── HEADER MOBILE ──────────────────────────── */
+.app-header {
+  flex-wrap: wrap;
+  padding: var(--spacing-md) !important;
+  gap: var(--spacing-sm);
+}
+
+.brand-logo {
+  max-height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── NAVEGAÇÃO MOBILE ──────────────────────────── */
+.app-nav {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.app-nav.active {
+  max-height: 500px;
+}
+
+.app-nav ul {
+  flex-direction: column;
+  width: 100%;
+  padding: var(--spacing-md);
+}
+
+.app-nav a {
+  padding: var(--spacing-md);
+  text-align: center;
+  display: block;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.app-nav a:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── CONTAINER FLUÍDO ──────────────────────────── */
+.app-main {
+  max-width: 100%;
+  padding: var(--spacing-md) !important;
+  margin: 0 auto;
+}
+
+/* ── TABELA RESPONSIVA ──────────────────────────── */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+  border-radius: 8px;
+}
+
+table {
+  min-width: 100%;
+}
+
+th, td {
+  padding: 0.5rem 0.25rem !important;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+}
+
+/* ── CARDS RESPONSIVOS ──────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.player-card {
+  padding: var(--spacing-md) !important;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-card:active {
+  transform: scale(0.98);
+}
+
+/* ── BOTÕES MOBILE-FRIENDLY ──────────────────────────── */
+button, .btn-back, .btn-edit {
+  min-height: 44px; /* Recomendação Apple HIG */
+  min-width: 44px;
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+/* ── MENU BURGER MOBILE ──────────────────────────── */
+.menu-toggle {
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--spacing-sm);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.menu-toggle:active {
+  opacity: 0.6;
+}
+
+/* ══════════════════════════════════════════════════ 
+   BREAKPOINT: 360px - MOBILE MUITO PEQUENO
+══════════════════════════════════════════════════ */
+@media (min-width: 360px) {
+  body {
+    font-size: 14px;
+  }
+
+  .app-main {
+    padding: 0.75rem;
+  }
+
+  .player-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .player-profile {
+    padding: 1rem !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   BREAKPOINT: 480px - MOBILE PADRÃO (IPHONE)
+══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  :root {
+    font-size: 15px;
+  }
+
+  /* Header */
+  .app-header {
+    padding: 0.75rem !important;
+    gap: 0.25rem;
+  }
+
+  .brand h1 {
+    font-size: 1rem;
+  }
+
+  /* Navegação escondida por padrão */
+  .app-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;
+    max-height: none;
+    width: 100vw;
+  }
+
+  .app-nav.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Conteúdo principal */
+  .app-main {
+    padding: 0.75rem !important;
+    gap: 1.5rem;
+  }
+
+  /* Tabela mobile-friendly */
+  table thead {
+    display: none;
+  }
+
+  table, tbody, tr, td {
+    display: block;
+    width: 100%;
+  }
+
+  tbody tr {
+    margin-bottom: 1rem;
+    padding: 1rem !important;
+    border-radius: 10px;
+    background: rgba(20, 20, 20, 0.85) !important;
+  }
+
+  td {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+    font-size: 0.9rem;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Cards */
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .player-card {
+    padding: 1.2rem !important;
+  }
+
+  /* Stats */
+  .player-stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Seções */
+  .section-header h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Input/textarea */
+  input, textarea, select {
+    font-size: 16px; /* Evitar zoom em iOS */
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  /* Toque visual */
+  a {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   BREAKPOINT: 768px - TABLET
+══════════════════════════════════════════════════ */
+@media (min-width: 481px) and (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .app-nav {
+    display: flex !important;
+    width: auto;
+    position: static;
+    background: transparent;
+    padding: 0;
+    order: 2;
+    flex: 1;
+  }
+
+  .app-nav ul {
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .app-main {
+    padding: 1.5rem;
+  }
+
+  table thead {
+    display: table-header-group;
+  }
+
+  table, tbody, tr, td {
+    display: table;
+  }
+
+  tbody tr {
+    display: table-row;
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent !important;
+  }
+
+  td {
+    display: table-cell !important;
+    padding: 0.75rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   BREAKPOINT: 1024px+ - DESKTOP
+══════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .app-main {
+    max-width: 1400px;
+    padding: 2rem;
+  }
+
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  table {
+    table-layout: auto;
+  }
+
+  .player-header {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   UTILITÁRIOS RESPONSIVOS
+══════════════════════════════════════════════════ */
+
+/* Mostrar/esconder por breakpoint */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .hide-mobile {
+    display: block;
+  }
+
+  .show-mobile {
+    display: none;
+  }
+}
+
+/* Imagens responsivas */
+.img-responsive {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Flex responsivo */
+.flex-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 769px) {
+  .flex-mobile {
+    flex-direction: row;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   ACESSIBILIDADE
+══════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0d0d0d;
+    color: #f1f1f1;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   ORIENTAÇÃO (LANDSCAPE vs PORTRAIT)
+══════════════════════════════════════════════════ */
+
+@media (max-height: 600px) {
+  header {
+    padding: 0.5rem;
+  }
+
+  .app-main {
+    padding-top: 0.75rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════ 
+   DICAS PARA MELHOR MOBILE
+══════════════════════════════════════════════════ */
+
+/* 1. Remover tap delay em iOS */
+body {
+  cursor: pointer;
+}
+
+/* 2. Suporte para notch (SafeArea) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* 3. Viewport height bug iOS */
+html, body {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height */
+}

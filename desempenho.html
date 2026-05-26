@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FutPontos – Desempenho Técnico</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="classificacao.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* --- */
+    /* CONTAINER PRINCIPAL                          */
+    /* --- */
+    .desempenho-section {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .desempenho-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    /* --- */
+    /* CARDS                                         */
+    /* --- */
+    .player-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .player-card:hover {
+      transform: translateY(-5px);
+      border-color: #00ff88;
+    }
+
+    .player-card h3 {
+      font-size: 1rem;
+      margin: 10px 0;
+      color: #00ff88;
+      text-align: center;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    .media-badge {
+      background: rgba(0, 255, 136, 0.2);
+      color: #00ff88;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    /* --- */
+    /* CANVAS CONTAINER                             */
+    /* --- */
+    .canvas-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      margin: 15px 0;
+      max-width: 250px;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* --- */
+    /* RESPONSIVIDADE TABLET (768px)                */
+    /* --- */
+    @media (max-width: 768px) {
+      .desempenho-section {
+        padding: 1.5rem 1rem;
+      }
+
+      .desempenho-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .player-card {
+        padding: 15px;
+      }
+
+      .player-card h3 {
+        font-size: 0.95rem;
+      }
+
+      .canvas-wrapper {
+        max-width: 200px;
+      }
+    }
+
+    /* --- */
+    /* RESPONSIVIDADE MOBILE (480px)                */
+    /* --- */
+    @media (max-width: 480px) {
+      .desempenho-section {
+        padding: 1rem 0.75rem;
+      }
+
+      .desempenho-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .player-card {
+        padding: 12px;
+      }
+
+      .player-card h3 {
+        font-size: 0.9rem;
+      }
+
+      .media-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+      }
+
+      .canvas-wrapper {
+        max-width: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BANNER INSTALL PWA -->
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho.html" class="active">Desempenho</a></li>
+        <li><a href="analise-semana.html">Análises</a></li>
+        <li><a href="topo.html">Topos</a></li>
+        <li><a href="videos.html" target="_blank">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section class="desempenho-section">
+      <header class="section-header">
+        <h2>Desempenho Técnico dos Jogadores</h2>
+        <p style="text-align: center; opacity: 0.7; margin-top: 10px;">Análise detalhada de habilidades individuais</p>
+      </header>
+
+      <div id="desempenhoContainer" class="desempenho-grid">
+        <!-- Cards serão inseridos via JS -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <span>© 2026 • FutPontos • semdominio.online</span>
+    </div>
+  </footer>
+
+  <div id="feedback" aria-live="polite"></div>
+
+  <script type="module" src="globais.js"></script>
+  <script src="menu.js"></script>
+  <script type="module" src="desempenho.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

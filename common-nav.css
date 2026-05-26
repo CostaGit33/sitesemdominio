@@ -1,0 +1,339 @@
+﻿/* ============================
+   Common Navigation & Global Styles
+   Baseado no padrão FutPontos
+============================ */
+
+:root {
+  --primary-color: #D62828;
+  --primary-gradient: linear-gradient(to right, #000000, #D62828);
+  --secondary-bg: #0f0f0f;
+  --accent-color: #ffffff;
+  --text-color: #ffffff;
+  --hover-color: #D62828;
+  --highlight-color: #ffcc00;
+  --app-gradient: linear-gradient(135deg, #0041A8, #000000, #D62828);
+  --font-family: "Oswald", sans-serif;
+  --border-color: #2e2e2e;
+  --surface-color: #1c1c1c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--secondary-bg);
+  color: var(--text-color);
+  line-height: 1.4;
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+/* Header & Nav */
+.app-header {
+  background: var(--primary-gradient);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+  touch-action: manipulation;
+}
+
+.menu-toggle:active {
+  opacity: 0.7;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+}
+
+.brand-logo {
+  height: 40px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.brand h1 {
+  font-size: 1.5rem;
+  color: var(--highlight-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.app-nav {
+  display: flex;
+}
+
+.app-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.app-nav a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.3s, opacity 0.3s;
+  opacity: 0.8;
+}
+
+.app-nav a:hover, .app-nav a.active {
+  opacity: 1;
+  color: var(--highlight-color);
+}
+
+/* BANNER INSTALL PWA */
+.install-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  animation: fadeUp 0.3s ease;
+  flex-wrap: wrap;
+  background: rgba(20, 20, 20, 0.95);
+}
+
+.install-banner.visible {
+  display: flex;
+}
+
+.install-banner-text strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.install-banner-text p {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  opacity: 0.5;
+}
+
+.install-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.install-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.install-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.install-btn.primary {
+  background: #4caf50;
+  color: #000;
+  border-color: transparent;
+}
+
+.install-btn.primary:hover {
+  opacity: 0.85;
+}
+
+/* ANIMAÇÃO FADE UP */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Feedback UI */
+.feedback {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  z-index: 2000;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.feedback.success {
+  background-color: #2ecc71;
+}
+
+.feedback.error {
+  background-color: #e74c3c;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.6;
+  font-size: 0.8rem;
+}
+
+/* RESPONSIVE TABLET (768px) */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  .app-header {
+    padding: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    height: 35px;
+  }
+
+  .menu-toggle {
+    display: block;
+    order: 3;
+    margin-left: auto;
+  }
+
+  .app-nav {
+    display: none;
+    order: 4;
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 0;
+    width: 100%;
+    background: #000;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    flex-direction: column;
+  }
+
+  .app-nav.active {
+    display: flex;
+  }
+
+  .app-nav ul {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .app-nav a {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .install-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 0.65rem 1rem;
+  }
+
+  .install-banner-actions {
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .install-btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+/* RESPONSIVE MOBILE (480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+
+  .app-header {
+    padding: 0.75rem;
+  }
+
+  .brand-logo {
+    height: 30px;
+  }
+
+  .menu-toggle {
+    font-size: 1.3rem;
+    padding: 0.3rem;
+  }
+
+  .app-nav {
+    top: 100%;
+  }
+
+  .app-nav a {
+    font-size: 0.9rem;
+  }
+
+  .install-banner {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .install-banner-text strong {
+    font-size: 0.8rem;
+  }
+
+  .install-banner-text p {
+    font-size: 0.65rem;
+  }
+
+  .install-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+  }
+}
+
+

@@ -1,0 +1,190 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FutPontos • Análise de Pontuação</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="classificacao.css" />
+  <style>
+    .app-main { gap: 1.5rem; }
+    .winners-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .winner-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      transform: translateY(10px) scale(0.98);
+      opacity: 0;
+      animation: winnerIn 0.45s ease forwards, glowPulse 2.4s ease-in-out infinite;
+    }
+    .winner-card:nth-child(1) { animation-delay: 0s, 0.35s; }
+    .winner-card:nth-child(2) { animation-delay: 0.08s, 0.43s; }
+    .winner-card:nth-child(3) { animation-delay: 0.16s, 0.51s; }
+    .winner-card h3 {
+      margin: 0 0 0.5rem;
+      color: var(--highlight-color);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .winner-name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #00ff88;
+    }
+    .winner-points {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.3rem;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .winner-card.is-updated {
+      border-color: rgba(0, 255, 136, 0.75);
+      box-shadow:
+        0 0 0 2px rgba(0, 255, 136, 0.2),
+        0 12px 28px rgba(0, 0, 0, 0.45),
+        0 0 22px rgba(0, 255, 136, 0.25);
+      animation: winnerPulse 0.55s ease;
+    }
+    .winner-card.is-updated .winner-points {
+      color: #00ff88;
+      transform: scale(1.05);
+    }
+    .rank-section { margin-top: 0.5rem; }
+    .meta-line {
+      text-align: center;
+      opacity: 0.75;
+      font-size: 0.85rem;
+      margin-top: -0.75rem;
+    }
+    .empty-state {
+      text-align: center;
+      opacity: 0.8;
+      padding: 1rem;
+    }
+    @keyframes winnerIn {
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); }
+      50% { box-shadow: 0 14px 28px rgba(0, 0, 0, 0.42), 0 0 16px rgba(255, 255, 255, 0.06); }
+    }
+    @keyframes winnerPulse {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="analise-semana.html" class="active">Análises</a></li>
+        <li><a href="topo.html">Topos</a></li>
+        <li><a href="videos.html" target="_blank" rel="noopener noreferrer">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section class="classification-section">
+      <header class="section-header">
+        <h1>Análise de Pontuação</h1>
+      </header>
+      <p class="meta-line" id="lastUpdate">Aguardando atualização...</p>
+
+      <div class="winners-grid">
+        <article class="winner-card" id="winnerCardWeek">
+          <h3>Destaque da Semana</h3>
+          <div id="winnerWeek" class="winner-name">Sem dados</div>
+          <div id="winnerWeekPoints" class="winner-points">+0 pontos</div>
+        </article>
+        <article class="winner-card" id="winnerCardMonth">
+          <h3>Destaque do Mês</h3>
+          <div id="winnerMonth" class="winner-name">Sem dados</div>
+          <div id="winnerMonthPoints" class="winner-points">+0 pontos</div>
+        </article>
+        <article class="winner-card" id="winnerCardYear">
+          <h3>Destaque do Ano</h3>
+          <div id="winnerYear" class="winner-name">Sem dados</div>
+          <div id="winnerYearPoints" class="winner-points">+0 pontos</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="classification-section rank-section">
+      <header class="section-header"><h2>Ranking da Semana (variação)</h2></header>
+      <div class="table-wrapper">
+        <table aria-label="Ranking semanal de variação de pontos">
+          <thead><tr><th>#</th><th>Jogador</th><th>Δ Pontos</th></tr></thead>
+          <tbody id="weekRankBody"><tr><td colspan="3">Sem dados ainda.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="classification-section rank-section">
+      <header class="section-header"><h2>Ranking do Mês (variação)</h2></header>
+      <div class="table-wrapper">
+        <table aria-label="Ranking mensal de variação de pontos">
+          <thead><tr><th>#</th><th>Jogador</th><th>Δ Pontos</th></tr></thead>
+          <tbody id="monthRankBody"><tr><td colspan="3">Sem dados ainda.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="classification-section rank-section">
+      <header class="section-header"><h2>Ranking do Ano (variação)</h2></header>
+      <div class="table-wrapper">
+        <table aria-label="Ranking anual de variação de pontos">
+          <thead><tr><th>#</th><th>Jogador</th><th>Δ Pontos</th></tr></thead>
+          <tbody id="yearRankBody"><tr><td colspan="3">Sem dados ainda.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <span>© 2026 • FutPontos • semdominio.online</span>
+    </div>
+  </footer>
+
+  <div id="feedback" aria-live="polite"></div>
+
+  <script src="menu.js"></script>
+  <script type="module" src="analise-semana.js"></script>
+</body>
+</html>
+
+
+
+

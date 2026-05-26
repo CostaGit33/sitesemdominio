@@ -1,0 +1,369 @@
+/* ======================================================
+   RESET / BASE
+====================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ======================================================
+   LAYOUT PRINCIPAL
+====================================================== */
+
+.app-main {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* ======================================================
+   TÍTULO DA SEÇÃO
+====================================================== */
+
+.section-header {
+  text-align: center;
+  padding: 1.5rem 1rem 1.2rem;
+}
+
+.section-header h1,
+.section-header h2 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--highlight-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* ======================================================
+   LOGO
+====================================================== */
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  width: 110px;
+}
+
+/* ======================================================
+   TABLE WRAPPER
+====================================================== */
+
+.table-wrapper {
+  width: 100%;
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+/* ======================================================
+   TABELA — DESKTOP
+====================================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+thead {
+  background: linear-gradient(
+    135deg,
+    rgba(214, 40, 40, 0.95),
+    rgba(140, 20, 20, 0.95)
+  );
+}
+
+th,
+td {
+  padding: 0.55rem 0.4rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+th {
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* DESKTOP — larguras das 8 colunas */
+th:nth-child(1), td:nth-child(1) { width: 4%; font-weight: 700; color: rgba(255,255,255,0.6); }
+th:nth-child(2), td:nth-child(2) { width: 30%; text-align: left; padding-left: 0.8rem; font-weight: 600; }
+th:nth-child(3), td:nth-child(3) { width: 10%; }
+th:nth-child(4), td:nth-child(4) { width: 10%; }
+th:nth-child(5), td:nth-child(5) { width: 10%; }
+th:nth-child(6), td:nth-child(6) { width: 12%; }
+th:nth-child(7), td:nth-child(7) { width: 12%; }
+th:nth-child(8), td:nth-child(8) { width: 12%; }
+
+/* HOVER */
+tbody tr {
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(214, 40, 40, 0.12);
+}
+
+/* LÍDER */
+tbody tr:first-child {
+  background: rgba(214, 40, 40, 0.22);
+  font-weight: 700;
+}
+
+tbody tr:first-child td:nth-child(1) {
+  color: var(--highlight-color);
+}
+
+/* PONTOS */
+td strong {
+  font-weight: 800;
+  color: #fff;
+}
+
+/* LINKS NA TABELA */
+.table-wrapper td a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.table-wrapper td a:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+/* ======================================================
+   CARDS
+====================================================== */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.player-card {
+  background: linear-gradient(
+    145deg,
+    rgba(214, 40, 40, 0.95),
+    rgba(120, 20, 20, 0.95)
+  );
+  border-radius: 18px;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+}
+
+.player-rank {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 900;
+  opacity: 0.35;
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.player-points {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--highlight-color);
+}
+
+/* ======================================================
+   TABLET (768px)
+====================================================== */
+
+@media (max-width: 768px) {
+
+  .app-main {
+    padding: 1.5rem 0.75rem;
+    gap: 2rem;
+  }
+
+  .section-header h1,
+  .section-header h2 {
+    font-size: 2rem;
+  }
+
+  th, td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  th {
+    font-size: 0.68rem;
+  }
+
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* ======================================================
+   MOBILE (480px)
+
+   Estratégia: table-layout fixed com width:0 nas colunas
+   ocultas — garante que 100% do espaço vai para as 6
+   colunas visíveis, sem scroll e sem overflow.
+
+   Mapeamento das 8 colunas:
+   col1 (#)   = 8%
+   col2 (JOG) = 38%
+   col3 (P)   = 13.5%
+   col4 (V)   = 13.5%
+   col5 (G)   = 13.5%
+   col6 (DEF) = 0%  ← hidden
+   col7 (EMP) = 0%  ← hidden
+   col8 (INF) = 13.5%
+   TOTAL      = 100%
+====================================================== */
+
+@media (max-width: 480px) {
+
+  .app-main {
+    padding: 0.5rem 0.25rem;
+    gap: 1rem;
+  }
+
+  .section-header {
+    padding: 1rem 0.5rem 0.75rem;
+  }
+
+  .section-header h1,
+  .section-header h2 {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  .brand-logo {
+    width: 90px;
+  }
+
+  .table-wrapper {
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  /* células compactas */
+  th, td {
+    padding: 0.38rem 0.15rem;
+    font-size: 0.71rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  th {
+    font-size: 0.60rem;
+    letter-spacing: 0.2px;
+    padding: 0.42rem 0.15rem;
+  }
+
+  /* --- LARGURAS EXPLÍCITAS DAS 8 COLUNAS --- */
+  th:nth-child(1), td:nth-child(1) { width: 8%; }
+  th:nth-child(2), td:nth-child(2) { width: 38%; padding-left: 0.3rem; text-align: left; }
+  th:nth-child(3), td:nth-child(3) { width: 13.5%; }
+  th:nth-child(4), td:nth-child(4) { width: 13.5%; }
+  th:nth-child(5), td:nth-child(5) { width: 13.5%; }
+
+  /* DEF — oculta, largura zero */
+  th:nth-child(6), td:nth-child(6) {
+    display: none;
+    width: 0;
+    padding: 0;
+  }
+
+  /* EMP — oculta, largura zero */
+  th:nth-child(7), td:nth-child(7) {
+    display: none;
+    width: 0;
+    padding: 0;
+  }
+
+  th:nth-child(8), td:nth-child(8) { width: 13.5%; }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .player-card {
+    padding: 1rem;
+  }
+}
+
+/* ======================================================
+   VERY SMALL (360px)
+====================================================== */
+
+@media (max-width: 360px) {
+
+  .section-header h1,
+  .section-header h2 {
+    font-size: 1.3rem;
+  }
+
+  th, td {
+    font-size: 0.62rem;
+    padding: 0.32rem 0.1rem;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 36%;
+  }
+
+  th:nth-child(3), td:nth-child(3),
+  th:nth-child(4), td:nth-child(4),
+  th:nth-child(5), td:nth-child(5),
+  th:nth-child(8), td:nth-child(8) {
+    width: 14.5%;
+  }
+}

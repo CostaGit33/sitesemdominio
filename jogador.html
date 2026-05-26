@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes do Jogador</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="jogador.css" />
+</head>
+<body>
+
+  <!-- BANNER INSTALL PWA -->
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="analise-semana.html">Análises</a></li>
+        <li><a href="topo.html">Topos</a></li>
+        <li><a href="videos.html" target="_blank">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="player-page">
+    <div id="playerState" class="player-loading">
+      Carregando jogador...
+    </div>
+
+    <section id="playerProfile" class="player-profile" hidden>
+      <div class="player-header">
+        <div class="photo-wrapper">
+          <img id="playerPhoto" class="player-photo" alt="Foto do jogador" />
+        </div>
+        <div class="player-info">
+          <h1 id="playerName" class="player-name"></h1>
+          <div class="player-points">
+            <span id="playerPoints">0</span> pts
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div id="statVitorias" class="stat-value">0</div>
+          <div class="stat-label">Vitórias</div>
+        </div>
+        <div class="stat-box">
+          <div id="statGols" class="stat-value">0</div>
+          <div class="stat-label">Gols</div>
+        </div>
+        <div class="stat-box">
+          <div id="statDefesas" class="stat-value">0</div>
+          <div class="stat-label">Defesas</div>
+        </div>
+        <div class="stat-box">
+          <div id="statEmpates" class="stat-value">0</div>
+          <div class="stat-label">Empates</div>
+        </div>
+        <div class="stat-box">
+          <div id="statInfracoes" class="stat-value">0</div>
+          <div class="stat-label">Infrações</div>
+        </div>
+      </div>
+
+      <div class="player-actions">
+        <a href="index.html" class="btn-back">
+          Voltar para classificação
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <span>© 2026 • FutPontos • semdominio.online</span>
+    </div>
+  </footer>
+
+  <div id="feedback" aria-live="polite"></div>
+
+  <script type="module" src="./globais.js"></script>
+  <script src="menu.js"></script>
+  <script type="module" src="./jogador.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

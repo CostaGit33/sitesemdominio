@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FutPontos • Vídeos</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="classificacao.css" />
+  <style>
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .video-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: .8rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+    .video-card h3 {
+      margin: 0 0 .6rem;
+      font-size: 1rem;
+      color: var(--highlight-color);
+    }
+    .video-card video {
+      width: 100%;
+      border-radius: 10px;
+      background: #000;
+    }
+    .meta-line {
+      text-align: center;
+      opacity: .75;
+      font-size: .85rem;
+      margin-top: -.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="analise-semana.html">Análises</a></li>
+        <li><a href="topo.html">Topos</a></li>
+        <li><a href="videos.html" class="active">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section class="classification-section">
+      <header class="section-header"><h1>Clips da Pelada</h1></header>
+      <p class="meta-line" id="videosStatus">Carregando clips...</p>
+      <div class="videos-grid" id="videosGrid"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content"><span>© 2026 • FutPontos • semdominio.online</span></div>
+  </footer>
+
+  <script src="menu.js"></script>
+  <script type="module" src="videos.js"></script>
+</body>
+</html>

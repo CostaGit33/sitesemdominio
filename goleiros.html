@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FutPontos – Goleiros</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#07080D" />
+  <link rel="icon" href="futponts_large.png" type="image/png" />
+  <link rel="apple-touch-icon" href="futponts_large.png" />
+
+  <link rel="stylesheet" href="common-nav.css" />
+  <link rel="stylesheet" href="classificacao.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Mantém em goleiros o mesmo padrão visual dos cards de jogadores */
+    #cards-goleiros .player-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    #cards-goleiros .player-card:hover {
+      border-color: #00ff88;
+    }
+
+    #cards-goleiros .player-name,
+    #cards-goleiros .player-name a {
+      color: #00ff88;
+      text-decoration: none;
+    }
+
+    #cards-goleiros .player-name a:hover {
+      opacity: 0.9;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BANNER INSTALL PWA -->
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text">
+      <strong>Instale o FutPontos no seu celular</strong>
+      <p>Acesso rápido, tela cheia, funciona offline.</p>
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-btn primary" id="install-confirm">Instalar</button>
+      <button class="install-btn" id="install-dismiss">Agora não</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" />
+    </div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html">Classificação</a></li>
+        <li><a href="goleiros.html" class="active">Goleiros</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="analise-semana.html">Análises</a></li>
+        <li><a href="topo.html">Topos</a></li>
+        <li><a href="videos.html" target="_blank">Vídeos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="app-main">
+
+    <section class="classification-section">
+      <header class="section-header">
+        <h2>Ranking de Goleiros</h2>
+      </header>
+      <div class="table-wrapper">
+        <table aria-label="Tabela de goleiros">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Goleiro</th>
+              <th>P</th>
+              <th>V</th>
+              <th>E</th>
+              <th>G</th>
+              <th>D</th>
+              <th>INF</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-goleiros">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="cards-section">
+      <header class="section-header">
+        <h2>Mural de Goleiros</h2>
+      </header>
+      <div class="cards" id="cards-goleiros">
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <span>© 2026 • FutPontos • semdominio.online</span>
+    </div>
+  </footer>
+
+  <div id="feedback" aria-live="polite"></div>
+
+  <script type="module" src="globais.js"></script>
+  <script src="menu.js"></script>
+  <script type="module" src="goleiros.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
