@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "futpontos-v13";
+﻿const CACHE_NAME = "futpontos-v18";
 
 // Arquivos que ficam disponíveis offline
 const STATIC_ASSETS = [
