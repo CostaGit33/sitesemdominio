@@ -15,20 +15,30 @@ function normalizarNome(nome = "") {
     .replace(/[^a-z0-9]/g, "");
 }
 
+// A avaliação técnica é uma fonte independente da API.
+// A API define QUEM aparece; desempenho_data.js define QUEM possui avaliação.
 const indiceTecnico = Object.fromEntries(
   Object.entries(desempenhoJogadores).map(([nome, stats]) => [
     normalizarNome(nome),
-    { nome, stats }
+    { nome, stats: Array.isArray(stats) && stats.length === 5 ? stats : null }
   ])
 );
 
 function obterAvaliacao(nome) {
-  return indiceTecnico[normalizarNome(nome)] || null;
+  const registro = indiceTecnico[normalizarNome(nome)];
+  return registro?.stats ? registro : null;
 }
 
 function numero(valor) {
   const n = Number(valor);
   return Number.isFinite(n) ? n : 0;
+}
+
+function primeiroNumero(...valores) {
+  for (const valor of valores) {
+    if (valor !== undefined && valor !== null && valor !== "") return numero(valor);
+  }
+  return 0;
 }
 
 function escapar(texto = "") {
@@ -49,9 +59,13 @@ function renderizar(lista) {
   }
 
   lista.forEach((j, index) => {
+    // IMPORTANTE: nunca filtramos jogadores pela avaliação.
+    // Se veio da API, ele aparece. A avaliação é opcional.
     const avaliacao = obterAvaliacao(j.nome);
     const stats = avaliacao?.stats || null;
-    const media = stats ? stats.reduce((a, b) => a + numero(b), 0) / stats.length : null;
+    const media = stats
+      ? stats.reduce((total, valor) => total + numero(valor), 0) / 5
+      : null;
     const canvasId = `complete_chart_${j.id ?? index}`;
     const card = document.createElement("article");
     card.className = "complete-card";
@@ -62,12 +76,12 @@ function renderizar(lista) {
 
       <div class="section-title">Dados da API</div>
       <div class="api-grid">
-        <div class="stat"><span>Vitórias</span><strong>${numero(j.vitorias)}</strong></div>
-        <div class="stat"><span>Empates</span><strong>${numero(j.empate)}</strong></div>
-        <div class="stat"><span>Gols</span><strong>${numero(j.gols)}</strong></div>
-        <div class="stat"><span>Defesas</span><strong>${numero(j.defesa)}</strong></div>
-        <div class="stat"><span>Infrações</span><strong>${numero(j.infracoes)}</strong></div>
-        <div class="stat"><span>Pontos</span><strong>${numero(j.pontos)}</strong></div>
+        <div class="stat"><span>Vitórias</span><strong>${primeiroNumero(j.vitorias, j.vitoria)}</strong></div>
+        <div class="stat"><span>Empates</span><strong>${primeiroNumero(j.empates, j.empate)}</strong></div>
+        <div class="stat"><span>Gols</span><strong>${primeiroNumero(j.gols, j.gol)}</strong></div>
+        <div class="stat"><span>Defesas</span><strong>${primeiroNumero(j.defesas, j.defesa)}</strong></div>
+        <div class="stat"><span>Infrações</span><strong>${primeiroNumero(j.infracoes, j.infrações)}</strong></div>
+        <div class="stat"><span>Pontos</span><strong>${primeiroNumero(j.pontos, j.ponto)}</strong></div>
       </div>
 
       <div class="section-title">Avaliação técnica</div>
@@ -82,42 +96,46 @@ function renderizar(lista) {
         <div class="average">Média Técnica<br><strong>${media.toFixed(1)} / 20</strong></div>
         <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>
       ` : `
-        <div class="missing">Avaliação técnica ainda não cadastrada para este jogador.</div>
+        <div class="missing">
+          Avaliação técnica ainda não cadastrada para este jogador.
+        </div>
       `}
     `;
 
     container.appendChild(card);
 
     if (stats && typeof window.Chart === "function") {
-      const canvas = document.getElementById(canvasId);
-      new window.Chart(canvas, {
-        type: "radar",
-        data: {
-          labels: ["Defesa", "Ataque", "Velocidade", "Habilidade", "Passe"],
-          datasets: [{
-            data: stats,
-            borderWidth: 2,
-            borderColor: "#00ff88",
-            backgroundColor: "rgba(0,255,136,.18)",
-            pointBackgroundColor: "#00ff88"
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-            r: {
-              min: 0,
-              max: 20,
-              ticks: { display: false },
-              grid: { color: "rgba(255,255,255,.1)" },
-              angleLines: { color: "rgba(255,255,255,.1)" },
-              pointLabels: { color: "#fff", font: { size: 11 } }
-            }
+      const canvas = card.querySelector(`#${canvasId}`);
+      if (canvas) {
+        new window.Chart(canvas, {
+          type: "radar",
+          data: {
+            labels: ["Defesa", "Ataque", "Velocidade", "Habilidade", "Passe"],
+            datasets: [{
+              data: stats,
+              borderWidth: 2,
+              borderColor: "#00ff88",
+              backgroundColor: "rgba(0,255,136,.18)",
+              pointBackgroundColor: "#00ff88"
+            }]
           },
-          plugins: { legend: { display: false } }
-        }
-      });
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              r: {
+                min: 0,
+                max: 20,
+                ticks: { display: false },
+                grid: { color: "rgba(255,255,255,.1)" },
+                angleLines: { color: "rgba(255,255,255,.1)" },
+                pointLabels: { color: "#fff", font: { size: 11 } }
+              }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
     }
   });
 }
@@ -126,16 +144,15 @@ async function carregar() {
   try {
     const dados = await apiRequest(JOGADORES_ENDPOINT);
 
-    if (!Array.isArray(dados)) throw new Error("Resposta inválida da API");
+    if (!Array.isArray(dados)) {
+      throw new Error("Resposta inválida da API: esperado um array de jogadores.");
+    }
 
+    // NÃO filtramos pela avaliação técnica.
+    // Todos os jogadores retornados pela API entram na página.
     jogadores = dados.map(j => ({
       ...j,
-      vitorias: numero(j.vitorias),
-      empate: numero(j.empate),
-      gols: numero(j.gols),
-      defesa: numero(j.defesa),
-      infracoes: numero(j.infracoes),
-      pontos: numero(j.pontos)
+      nome: j.nome ?? j.name ?? "Jogador sem nome"
     }));
 
     status.textContent = `${jogadores.length} jogadores carregados pela API.`;
@@ -152,6 +169,7 @@ function aplicarFiltro() {
   const filtrados = termo
     ? jogadores.filter(j => normalizarNome(j.nome).includes(termo))
     : jogadores;
+
   renderizar(filtrados);
 }
 
