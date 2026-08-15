@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const installConfirm = document.getElementById("install-confirm");
   const installDismiss = document.getElementById("install-dismiss");
   const INSTALL_KEY = "fp_install_dismissed";
+  const SW_RESET_KEY = "fp_sw_reset_v37";
   let installPromptEvent = null;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
@@ -70,8 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {
       try {
-        // A versão na URL obriga o navegador a buscar o SW atual.
-        const registration = await navigator.serviceWorker.register("/sw.js?v=36", {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+
+        // Remove versões antigas que possam estar presas no navegador.
+        // Executa somente uma vez por instalação do site.
+        if (!sessionStorage.getItem(SW_RESET_KEY)) {
+          sessionStorage.setItem(SW_RESET_KEY, "1");
+          await Promise.all(registrations.map(reg => reg.unregister()));
+
+          // Garante que a página seja recarregada sem o SW antigo controlando-a.
+          window.location.reload();
+          return;
+        }
+
+        const registration = await navigator.serviceWorker.register("/sw.js?v=37", {
           scope: "/",
           updateViaCache: "none"
         });
