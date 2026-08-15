@@ -41,6 +41,48 @@ function iniciais(nome = "") {
   return (partes.length === 1 ? partes[0].slice(0, 2) : partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
 }
 
+function obterStats(jogador) {
+  const avaliacao = jogador?.avaliacao;
+  if (!avaliacao) return null;
+
+  return [
+    numero(avaliacao.defesa),
+    numero(avaliacao.ataque),
+    numero(avaliacao.velocidade),
+    numero(avaliacao.habilidade),
+    numero(avaliacao.passe)
+  ];
+}
+
+function obterMedia(stats) {
+  if (!stats) return null;
+  return stats.reduce((total, valor) => total + valor, 0) / stats.length;
+}
+
+function ordenarPorDesempenho(lista) {
+  return [...lista].sort((a, b) => {
+    const mediaA = obterMedia(obterStats(a));
+    const mediaB = obterMedia(obterStats(b));
+
+    // Jogadores avaliados sempre ficam antes dos que ainda não possuem avaliação.
+    if (mediaA === null && mediaB !== null) return 1;
+    if (mediaA !== null && mediaB === null) return -1;
+
+    // Primeiro critério: média técnica, da maior para a menor.
+    if (mediaA !== null && mediaB !== null && mediaA !== mediaB) {
+      return mediaB - mediaA;
+    }
+
+    // Segundo critério: soma total das cinco categorias.
+    const somaA = obterStats(a)?.reduce((total, valor) => total + valor, 0) ?? -1;
+    const somaB = obterStats(b)?.reduce((total, valor) => total + valor, 0) ?? -1;
+    if (somaA !== somaB) return somaB - somaA;
+
+    // Terceiro critério: nome, para manter uma ordem estável.
+    return String(a.nome).localeCompare(String(b.nome), "pt-BR");
+  });
+}
+
 function renderizar(lista) {
   container.innerHTML = "";
 
@@ -49,22 +91,11 @@ function renderizar(lista) {
     return;
   }
 
-  lista.forEach((j, index) => {
-    const avaliacao = j.avaliacao;
-    const stats = avaliacao
-      ? [
-          numero(avaliacao.defesa),
-          numero(avaliacao.ataque),
-          numero(avaliacao.velocidade),
-          numero(avaliacao.habilidade),
-          numero(avaliacao.passe)
-        ]
-      : null;
+  const listaOrdenada = ordenarPorDesempenho(lista);
 
-    const media = stats
-      ? stats.reduce((total, valor) => total + valor, 0) / stats.length
-      : null;
-
+  listaOrdenada.forEach((j, index) => {
+    const stats = obterStats(j);
+    const media = obterMedia(stats);
     const canvasId = `complete_chart_${j.id ?? index}`;
     const card = document.createElement("article");
     card.className = "complete-card";
