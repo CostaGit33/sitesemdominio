@@ -12,135 +12,63 @@
   <link rel="stylesheet" href="classificacao.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    /* Estilos exclusivos desta página: não reutilizar .player-card para evitar conflito com desempenho.html */
     .complete-section { width:100%; max-width:1500px; margin:0 auto; padding:2rem clamp(.8rem,2vw,1.5rem); }
-    .complete-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr)); gap:22px; align-items:start; }
+    #completeContainer.complete-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr)); gap:22px; align-items:start; }
 
-    .complete-card {
-      position:relative;
-      min-width:0;
-      box-sizing:border-box;
+    #completeContainer .complete-card {
+      position:relative; min-width:0; box-sizing:border-box;
       background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
-      border:1px solid rgba(255,255,255,.11);
-      border-radius:18px;
-      padding:20px;
-      overflow:hidden;
-      box-shadow:0 10px 30px rgba(0,0,0,.18);
-      opacity:0;
-      transform:translateY(18px) scale(.985);
-      animation:cardEnter .55s cubic-bezier(.2,.75,.25,1) forwards;
-      transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border:1px solid rgba(255,255,255,.11); border-radius:18px; padding:20px;
+      overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.18);
+      opacity:0; transform:translateY(18px) scale(.985);
+      animation:completeCardEnter .55s cubic-bezier(.2,.75,.25,1) forwards;
+      transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
     }
-    .complete-card::before {
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:2px;
-      background:linear-gradient(90deg,transparent,#00ff88,transparent);
-      opacity:.55;
-    }
-    .complete-card:hover {
-      transform:translateY(-5px);
-      border-color:rgba(0,255,136,.28);
-      box-shadow:0 16px 38px rgba(0,0,0,.28),0 0 24px rgba(0,255,136,.05);
-    }
-    @keyframes cardEnter { to { opacity:1; transform:translateY(0) scale(1); } }
+    #completeContainer .complete-card::before { content:""; position:absolute; inset:0 0 auto 0; height:2px; background:linear-gradient(90deg,transparent,#00ff88,transparent); opacity:.55; }
+    #completeContainer .complete-card:hover { transform:translateY(-5px); border-color:rgba(0,255,136,.28); box-shadow:0 16px 38px rgba(0,0,0,.28),0 0 24px rgba(0,255,136,.05); }
+    @keyframes completeCardEnter { to { opacity:1; transform:translateY(0) scale(1); } }
 
-    .player-head { display:flex; align-items:center; gap:12px; min-width:0; padding-right:64px; }
-    .player-avatar {
-      width:44px; height:44px; flex:0 0 44px; border-radius:50%;
-      display:grid; place-items:center;
-      background:rgba(0,255,136,.1); border:1px solid rgba(0,255,136,.25);
-      color:#00ff88; font-weight:800; font-size:1rem;
-    }
-    .player-title { min-width:0; }
-    .player-title h3 { margin:0; color:#fff; font-size:1.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .player-subtitle { margin-top:3px; font-size:.72rem; opacity:.5; }
+    #completeContainer .player-head { display:flex; align-items:center; gap:12px; min-width:0; padding-right:64px; }
+    #completeContainer .player-avatar { width:44px; height:44px; flex:0 0 44px; border-radius:50%; display:grid; place-items:center; background:rgba(0,255,136,.1); border:1px solid rgba(0,255,136,.25); color:#00ff88; font-weight:800; font-size:1rem; }
+    #completeContainer .player-title { min-width:0; }
+    #completeContainer .player-title h3 { margin:0; color:#fff; font-size:1.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #completeContainer .player-subtitle { margin-top:3px; font-size:.72rem; opacity:.5; }
 
-    .average-badge {
-      position:absolute; top:16px; right:16px;
-      min-width:48px; padding:5px 7px; border-radius:9px;
-      text-align:center; background:rgba(0,255,136,.10);
-      border:1px solid rgba(0,255,136,.24); color:#00ff88;
-      line-height:1.05; box-shadow:0 0 14px rgba(0,255,136,.05);
-    }
-    .average-badge small { display:block; font-size:.55rem; opacity:.65; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
-    .average-badge strong { font-size:1rem; }
+    /* Média técnica: manter este destaque no canto superior direito */
+    #completeContainer .average-badge { position:absolute; top:16px; right:16px; min-width:48px; padding:5px 7px; border-radius:9px; text-align:center; background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.24); color:#00ff88; line-height:1.05; box-shadow:0 0 14px rgba(0,255,136,.05); }
+    #completeContainer .average-badge small { display:block; font-size:.55rem; opacity:.65; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
+    #completeContainer .average-badge strong { font-size:1rem; }
 
-    .api-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:18px; }
-    .stat { min-width:0; box-sizing:border-box; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.055); border-radius:9px; padding:8px 6px; text-align:center; }
-    .stat span { display:block; font-size:.66rem; opacity:.55; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .stat strong { display:block; color:#00ff88; margin-top:3px; font-size:.95rem; }
+    #completeContainer .api-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:18px; }
+    #completeContainer .stat { min-width:0; box-sizing:border-box; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.055); border-radius:9px; padding:8px 6px; text-align:center; }
+    #completeContainer .stat span { display:block; font-size:.66rem; opacity:.55; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #completeContainer .stat strong { display:block; color:#00ff88; margin-top:3px; font-size:.95rem; }
 
-    .technical-header { display:flex; justify-content:space-between; align-items:center; margin:18px 0 9px; }
-    .section-title { margin:0; font-size:.76rem; text-transform:uppercase; letter-spacing:.1em; opacity:.55; }
-    .evaluation-status { font-size:.66rem; color:#00ff88; opacity:.75; }
-
-    .tech-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
-    .tech-grid .stat { padding:8px 3px; }
-    .tech-grid .stat span { font-size:.6rem; }
-    .tech-grid .stat strong { font-size:1rem; }
-
-    .chart-wrap { width:min(100%,260px); aspect-ratio:1/1; margin:10px auto 0; position:relative; }
-    .chart-wrap canvas { width:100%!important; height:100%!important; }
-
-    .missing { margin-top:18px; padding:13px; border-radius:10px; background:rgba(255,255,255,.035); border:1px dashed rgba(255,255,255,.1); font-size:.82rem; opacity:.6; text-align:center; }
+    #completeContainer .technical-header { display:flex; justify-content:space-between; align-items:center; margin:18px 0 9px; }
+    #completeContainer .section-title { margin:0; font-size:.76rem; text-transform:uppercase; letter-spacing:.1em; opacity:.55; }
+    #completeContainer .evaluation-status { font-size:.66rem; color:#00ff88; opacity:.75; }
+    #completeContainer .tech-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+    #completeContainer .tech-grid .stat { padding:8px 3px; }
+    #completeContainer .tech-grid .stat span { font-size:.6rem; }
+    #completeContainer .tech-grid .stat strong { font-size:1rem; }
+    #completeContainer .chart-wrap { width:min(100%,260px); aspect-ratio:1/1; margin:10px auto 0; position:relative; }
+    #completeContainer .chart-wrap canvas { width:100%!important; height:100%!important; }
+    #completeContainer .missing { margin-top:18px; padding:13px; border-radius:10px; background:rgba(255,255,255,.035); border:1px dashed rgba(255,255,255,.1); font-size:.82rem; opacity:.6; text-align:center; }
 
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin:20px 0 10px; justify-content:center; }
     .toolbar input { width:min(100%,390px); box-sizing:border-box; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; outline:none; transition:border-color .2s,box-shadow .2s; }
     .toolbar input:focus { border-color:rgba(0,255,136,.45); box-shadow:0 0 0 3px rgba(0,255,136,.06); }
     .status { text-align:center; opacity:.6; margin:14px 0 20px; font-size:.82rem; }
 
-    @media(max-width:760px) {
-      .complete-section { padding:1.2rem .75rem; }
-      .complete-grid { grid-template-columns:1fr; gap:16px; }
-      .complete-card { padding:17px; }
-    }
-    @media(max-width:390px) {
-      .api-grid { grid-template-columns:repeat(2,1fr); }
-      .tech-grid { grid-template-columns:repeat(3,1fr); }
-      .chart-wrap { width:min(100%,230px); }
-    }
-    @media(prefers-reduced-motion:reduce) {
-      .complete-card { animation:none; opacity:1; transform:none; transition:none; }
-    }
+    @media(max-width:760px) { .complete-section { padding:1.2rem .75rem; } #completeContainer.complete-grid { grid-template-columns:1fr; gap:16px; } #completeContainer .complete-card { padding:17px; } }
+    @media(max-width:390px) { #completeContainer .api-grid { grid-template-columns:repeat(2,1fr); } #completeContainer .tech-grid { grid-template-columns:repeat(3,1fr); } #completeContainer .chart-wrap { width:min(100%,230px); } }
+    @media(prefers-reduced-motion:reduce) { #completeContainer .complete-card { animation:none; opacity:1; transform:none; transition:none; } }
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo"></div>
-    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
-    <nav class="app-nav" aria-label="Navegação principal">
-      <ul>
-        <li><a href="index.html">Classificação</a></li>
-        <li><a href="goleiros.html">Goleiros</a></li>
-        <li><a href="desempenho.html">Desempenho</a></li>
-        <li><a href="desempenho-completo.html">Desempenho Completo</a></li>
-        <li><a href="analise-semana.html">Análises</a></li>
-        <li><a href="topo.html">Topos</a></li>
-        <li><a href="videos.html" target="_blank">Vídeos</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main class="app-main">
-    <section class="complete-section">
-      <header class="section-header">
-        <h2>Desempenho Completo</h2>
-        <p style="text-align:center;opacity:.65;margin-top:10px">Estatísticas e avaliação técnica dos jogadores</p>
-      </header>
-      <div class="toolbar">
-        <input id="searchPlayer" type="search" placeholder="Buscar jogador..." autocomplete="off">
-      </div>
-      <div id="completeStatus" class="status">Carregando jogadores...</div>
-      <div id="completeContainer" class="complete-grid"></div>
-    </section>
-  </main>
-
-  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer>
-  <div id="feedback" aria-live="polite"></div>
-
-  <script type="module" src="globais.js"></script>
-  <script src="menu.js"></script>
-  <script type="module" src="desempenho-completo.js"></script>
-</body>
-</html>
+  <header class="app-header"><div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo"></div><button class="menu-toggle" aria-label="Abrir menu">☰</button><nav class="app-nav" aria-label="Navegação principal"><ul><li><a href="index.html">Classificação</a></li><li><a href="goleiros.html">Goleiros</a></li><li><a href="desempenho.html">Desempenho</a></li><li><a href="desempenho-completo.html">Desempenho Completo</a></li><li><a href="analise-semana.html">Análises</a></li><li><a href="topo.html">Topos</a></li><li><a href="videos.html" target="_blank">Vídeos</a></li></ul></nav></header>
+  <main class="app-main"><section class="complete-section"><header class="section-header"><h2>Desempenho Completo</h2><p style="text-align:center;opacity:.65;margin-top:10px">Estatísticas e avaliação técnica dos jogadores</p></header><div class="toolbar"><input id="searchPlayer" type="search" placeholder="Buscar jogador..." autocomplete="off"></div><div id="completeStatus" class="status">Carregando jogadores...</div><div id="completeContainer" class="complete-grid"></div></section></main>
+  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer><div id="feedback" aria-live="polite"></div>
+  <script type="module" src="globais.js"></script><script src="menu.js"></script><script type="module" src="desempenho-completo.js"></script>
+</body></html>
