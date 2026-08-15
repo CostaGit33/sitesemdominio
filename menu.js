@@ -40,17 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleMenu();
     });
 
-    const navLinks = appNav.querySelectorAll("a");
-    navLinks.forEach(link => {
-      link.addEventListener("click", () => {
-        closeMenu();
-      });
+    appNav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", closeMenu);
     });
 
     document.addEventListener("click", (e) => {
-      if (!appNav.contains(e.target) && !menuToggle.contains(e.target)) {
-        closeMenu();
-      }
+      if (!appNav.contains(e.target) && !menuToggle.contains(e.target)) closeMenu();
     });
 
     window.addEventListener("resize", () => {
@@ -65,8 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(error => {
-      console.error("Erro ao registrar Service Worker:", error);
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" })
+        .then(registration => registration.update())
+        .catch(error => console.error("Erro ao registrar Service Worker:", error));
     });
   }
 
@@ -74,17 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     installPromptEvent = event;
 
-    const dismissed = localStorage.getItem(INSTALL_KEY);
-    if (installBanner && !dismissed) {
+    if (installBanner && !localStorage.getItem(INSTALL_KEY)) {
       installBanner.classList.add("visible");
     }
   });
 
   window.addEventListener("appinstalled", () => {
     installPromptEvent = null;
-    if (installBanner) {
-      installBanner.classList.remove("visible");
-    }
+    if (installBanner) installBanner.classList.remove("visible");
     localStorage.removeItem(INSTALL_KEY);
   });
 
@@ -94,18 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
       installPromptEvent.prompt();
       await installPromptEvent.userChoice;
       installPromptEvent = null;
-      if (installBanner) {
-        installBanner.classList.remove("visible");
-      }
+      if (installBanner) installBanner.classList.remove("visible");
     });
   }
 
   if (installDismiss) {
     installDismiss.addEventListener("click", () => {
       localStorage.setItem(INSTALL_KEY, String(Date.now()));
-      if (installBanner) {
-        installBanner.classList.remove("visible");
-      }
+      if (installBanner) installBanner.classList.remove("visible");
     });
   }
 });
