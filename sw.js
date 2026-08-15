@@ -1,7 +1,7 @@
-const CACHE_NAME = "futpontos-v36";
+const CACHE_NAME = "futpontos-v37";
 
-// Somente recursos estáveis entram no cache. HTML, CSS e JavaScript
-// nunca são servidos do Cache Storage para evitar layouts antigos.
+// O Service Worker não armazena HTML, CSS ou JavaScript.
+// Esses arquivos devem sempre vir da publicação atual.
 const STATIC_ASSETS = [
   "/futponts_large.png",
   "/manifest.json"
@@ -30,12 +30,12 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const isLiveFile =
+  const liveFile =
     request.mode === "navigate" ||
     request.headers.get("accept")?.includes("text/html") ||
     /\.(html|js|css)$/i.test(url.pathname);
 
-  if (isLiveFile) {
+  if (liveFile) {
     event.respondWith(
       fetch(request, { cache: "no-store" }).catch(() =>
         new Response("Sem conexão para carregar esta página.", {
@@ -47,5 +47,8 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  event.respondWith(fetch(request).catch(() => caches.match(request)));
+  // Para os demais recursos: rede primeiro, cache somente como fallback.
+  event.respondWith(
+    fetch(request).catch(() => caches.match(request))
+  );
 });
