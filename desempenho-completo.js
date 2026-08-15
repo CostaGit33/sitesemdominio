@@ -1,7 +1,6 @@
 import { apiRequest } from "./globais.js";
-import { desempenhoJogadores } from "./desempenho_data.js";
 
-const JOGADORES_ENDPOINT = "/jogadores";
+const DESEMPENHO_ENDPOINT = "/desempenho";
 const container = document.getElementById("completeContainer");
 const status = document.getElementById("completeStatus");
 const search = document.getElementById("searchPlayer");
@@ -13,20 +12,6 @@ function normalizarNome(nome = "") {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-}
-
-// A API define quais jogadores aparecem. A avaliação é opcional e independente.
-const indiceTecnico = Object.fromEntries(
-  Object.entries(desempenhoJogadores).map(([nome, stats]) => [
-    normalizarNome(nome),
-    { nome, stats: Array.isArray(stats) && stats.length === 5 ? stats : null }
-  ])
-);
-
-function obterAvaliacao(nome) {
-  const chave = normalizarNome(nome);
-  const registro = indiceTecnico[chave];
-  return registro?.stats ? registro : null;
 }
 
 function numero(valor) {
@@ -59,11 +44,21 @@ function renderizar(lista) {
   }
 
   lista.forEach((j, index) => {
-    const avaliacao = obterAvaliacao(j.nome);
-    const stats = avaliacao?.stats || null;
-    const media = stats
-      ? stats.reduce((total, valor) => total + numero(valor), 0) / stats.length
+    const avaliacao = j.avaliacao;
+    const stats = avaliacao
+      ? [
+          numero(avaliacao.defesa),
+          numero(avaliacao.ataque),
+          numero(avaliacao.velocidade),
+          numero(avaliacao.habilidade),
+          numero(avaliacao.passe)
+        ]
       : null;
+
+    const media = stats
+      ? stats.reduce((total, valor) => total + valor, 0) / stats.length
+      : null;
+
     const canvasId = `complete_chart_${j.id ?? index}`;
     const card = document.createElement("article");
     card.className = "complete-card";
@@ -75,9 +70,9 @@ function renderizar(lista) {
       <div class="section-title">Dados da API</div>
       <div class="api-grid">
         <div class="stat"><span>Vitórias</span><strong>${primeiroNumero(j.vitorias, j.vitoria)}</strong></div>
-        <div class="stat"><span>Empates</span><strong>${primeiroNumero(j.empates, j.empate)}</strong></div>
+        <div class="stat"><span>Empates</span><strong>${primeiroNumero(j.empate, j.empates)}</strong></div>
         <div class="stat"><span>Gols</span><strong>${primeiroNumero(j.gols, j.gol)}</strong></div>
-        <div class="stat"><span>Defesas</span><strong>${primeiroNumero(j.defesas, j.defesa)}</strong></div>
+        <div class="stat"><span>Defesas</span><strong>${primeiroNumero(j.defesaClassificacao, j.defesa)}</strong></div>
         <div class="stat"><span>Infrações</span><strong>${primeiroNumero(j.infracoes, j.infrações)}</strong></div>
         <div class="stat"><span>Pontos</span><strong>${primeiroNumero(j.pontos, j.ponto)}</strong></div>
       </div>
@@ -140,10 +135,10 @@ function renderizar(lista) {
 
 async function carregar() {
   try {
-    const dados = await apiRequest(JOGADORES_ENDPOINT);
+    const dados = await apiRequest(DESEMPENHO_ENDPOINT);
 
     if (!Array.isArray(dados)) {
-      throw new Error("Resposta inválida da API: esperado um array de jogadores.");
+      throw new Error("Resposta inválida da API de desempenho.");
     }
 
     jogadores = dados.map(j => ({
@@ -151,19 +146,15 @@ async function carregar() {
       nome: j.nome ?? j.name ?? "Jogador sem nome"
     }));
 
-    status.textContent = `${jogadores.length} jogadores carregados pela API.`;
+    const avaliados = jogadores.filter(j => j.avaliacao).length;
+    const semAvaliacao = jogadores.length - avaliados;
 
-    // Ajuda a identificar qualquer divergência de nome sem impedir a exibição.
-    jogadores.forEach(j => {
-      if (!obterAvaliacao(j.nome)) {
-        console.warn(`[Desempenho] Sem avaliação para o jogador da API: "${j.nome}"`);
-      }
-    });
+    status.textContent = `${jogadores.length} jogadores carregados • ${avaliados} avaliados • ${semAvaliacao} sem avaliação.`;
 
     aplicarFiltro();
   } catch (error) {
     console.error("Erro ao carregar desempenho completo:", error);
-    status.textContent = "Não foi possível carregar os dados da API.";
+    status.textContent = "Não foi possível carregar os dados da API de desempenho.";
     container.innerHTML = `<p class="status">${escapar(error.message)}</p>`;
   }
 }
@@ -177,5 +168,5 @@ function aplicarFiltro() {
   renderizar(filtrados);
 }
 
-search.addEventListener("input", aplicarFiltro);
+if (search) search.addEventListener("input", aplicarFiltro);
 carregar();
