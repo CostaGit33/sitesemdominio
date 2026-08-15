@@ -35,6 +35,12 @@ function escapar(texto = "") {
     .replace(/'/g, "&#039;");
 }
 
+function iniciais(nome = "") {
+  const partes = String(nome).trim().split(/\s+/).filter(Boolean);
+  if (!partes.length) return "?";
+  return (partes.length === 1 ? partes[0].slice(0, 2) : partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+}
+
 function renderizar(lista) {
   container.innerHTML = "";
 
@@ -62,12 +68,24 @@ function renderizar(lista) {
     const canvasId = `complete_chart_${j.id ?? index}`;
     const card = document.createElement("article");
     card.className = "complete-card";
+    card.style.animationDelay = `${Math.min(index * 55, 700)}ms`;
 
     card.innerHTML = `
-      <h3>${escapar(j.nome)}</h3>
-      <div class="player-id">ID: ${escapar(j.id ?? "-")}</div>
+      ${media !== null ? `
+        <div class="average-badge" title="Média das cinco categorias técnicas">
+          <small>Média</small>
+          <strong>${media.toFixed(1)}</strong>
+        </div>
+      ` : ""}
 
-      <div class="section-title">Dados da API</div>
+      <div class="player-head">
+        <div class="player-avatar">${escapar(iniciais(j.nome))}</div>
+        <div class="player-title">
+          <h3>${escapar(j.nome)}</h3>
+          <div class="player-subtitle">Desempenho do jogador</div>
+        </div>
+      </div>
+
       <div class="api-grid">
         <div class="stat"><span>Vitórias</span><strong>${primeiroNumero(j.vitorias, j.vitoria)}</strong></div>
         <div class="stat"><span>Empates</span><strong>${primeiroNumero(j.empate, j.empates)}</strong></div>
@@ -77,16 +95,19 @@ function renderizar(lista) {
         <div class="stat"><span>Pontos</span><strong>${primeiroNumero(j.pontos, j.ponto)}</strong></div>
       </div>
 
-      <div class="section-title">Avaliação técnica</div>
+      <div class="technical-header">
+        <div class="section-title">Avaliação técnica</div>
+        <div class="evaluation-status">${stats ? "Avaliado" : "Pendente"}</div>
+      </div>
+
       ${stats ? `
         <div class="tech-grid">
-          <div class="stat">Defesa<strong>${stats[0]}</strong></div>
-          <div class="stat">Ataque<strong>${stats[1]}</strong></div>
-          <div class="stat">Velocidade<strong>${stats[2]}</strong></div>
-          <div class="stat">Habilidade<strong>${stats[3]}</strong></div>
-          <div class="stat">Passe<strong>${stats[4]}</strong></div>
+          <div class="stat"><span>Defesa</span><strong>${stats[0]}</strong></div>
+          <div class="stat"><span>Ataque</span><strong>${stats[1]}</strong></div>
+          <div class="stat"><span>Velocidade</span><strong>${stats[2]}</strong></div>
+          <div class="stat"><span>Habilidade</span><strong>${stats[3]}</strong></div>
+          <div class="stat"><span>Passe</span><strong>${stats[4]}</strong></div>
         </div>
-        <div class="average">Média Técnica<br><strong>${media.toFixed(1)} / 20</strong></div>
         <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>
       ` : `
         <div class="missing">
@@ -109,12 +130,15 @@ function renderizar(lista) {
               borderWidth: 2,
               borderColor: "#00ff88",
               backgroundColor: "rgba(0,255,136,.18)",
-              pointBackgroundColor: "#00ff88"
+              pointBackgroundColor: "#00ff88",
+              pointRadius: 3,
+              pointHoverRadius: 5
             }]
           },
           options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: "easeOutQuart" },
             scales: {
               r: {
                 min: 0,
@@ -122,10 +146,10 @@ function renderizar(lista) {
                 ticks: { display: false },
                 grid: { color: "rgba(255,255,255,.1)" },
                 angleLines: { color: "rgba(255,255,255,.1)" },
-                pointLabels: { color: "#fff", font: { size: 11 } }
+                pointLabels: { color: "#fff", font: { size: 10 } }
               }
             },
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false }, tooltip: { displayColors: false } }
           }
         });
       }
@@ -148,13 +172,12 @@ async function carregar() {
 
     const avaliados = jogadores.filter(j => j.avaliacao).length;
     const semAvaliacao = jogadores.length - avaliados;
-
-    status.textContent = `${jogadores.length} jogadores carregados • ${avaliados} avaliados • ${semAvaliacao} sem avaliação.`;
+    status.textContent = `${jogadores.length} jogadores • ${avaliados} avaliados • ${semAvaliacao} pendentes`;
 
     aplicarFiltro();
   } catch (error) {
     console.error("Erro ao carregar desempenho completo:", error);
-    status.textContent = "Não foi possível carregar os dados da API de desempenho.";
+    status.textContent = "Não foi possível carregar os dados do desempenho.";
     container.innerHTML = `<p class="status">${escapar(error.message)}</p>`;
   }
 }
