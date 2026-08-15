@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v31";
+const CACHE_NAME = "futpontos-v32";
 
 const STATIC_ASSETS = [
   "/",
@@ -55,8 +55,7 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navegação e arquivos críticos sempre tentam a versão publicada primeiro.
-  // Isso garante que mudanças no desempenho-completo.js não fiquem presas no cache.
+  // HTML e arquivos ligados ao desempenho usam sempre a versão mais recente.
   if (
     request.headers.get("accept")?.includes("text/html") ||
     [
@@ -65,6 +64,8 @@ self.addEventListener("fetch", event => {
       "/desempenho.js",
       "/desempenho-completo.js",
       "/desempenho-completo.html",
+      "/classificacao.css",
+      "/common-nav.css",
       "/manifest.json",
       "/sw.js"
     ].includes(url.pathname)
