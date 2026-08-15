@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v25";
+const CACHE_NAME = "futpontos-v26";
 
 const STATIC_ASSETS = [
   "/",
