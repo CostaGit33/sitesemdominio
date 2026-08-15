@@ -12,25 +12,97 @@
   <link rel="stylesheet" href="classificacao.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .complete-section { width:100%; max-width:1400px; margin:0 auto; padding:2rem 1rem; }
-    .complete-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; }
-    .complete-card { position:relative; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:15px; padding:20px; overflow:hidden; }
-    .complete-card h3 { margin:0 0 4px; color:#00ff88; font-size:1.2rem; }
-    .player-id { opacity:.55; font-size:.75rem; margin-bottom:14px; }
-    .section-title { font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; margin:16px 0 8px; }
-    .api-grid,.tech-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
-    .stat { background:rgba(255,255,255,.04); border-radius:8px; padding:9px; display:flex; justify-content:space-between; gap:8px; }
-    .stat strong { color:#00ff88; }
-    .tech-grid .stat { display:block; text-align:center; }
-    .tech-grid .stat strong { display:block; font-size:1.2rem; margin-top:3px; }
-    .average { margin-top:14px; text-align:center; padding:10px; border:1px solid rgba(0,255,136,.25); border-radius:10px; }
-    .average strong { color:#00ff88; font-size:1.25rem; }
-    .chart-wrap { max-width:300px; margin:10px auto 0; }
-    .missing { opacity:.65; font-size:.9rem; padding:10px; background:rgba(255,255,255,.04); border-radius:8px; }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0; justify-content:center; }
-    .toolbar input { width:min(100%,360px); padding:11px 14px; border-radius:9px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; outline:none; }
-    .status { text-align:center; opacity:.7; margin:15px 0; }
-    @media(max-width:480px){ .complete-section{padding:1rem .75rem}.complete-grid{grid-template-columns:1fr}.complete-card{padding:15px} }
+    .complete-section { width:100%; max-width:1500px; margin:0 auto; padding:2rem clamp(.8rem,2vw,1.5rem); }
+    .complete-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr)); gap:22px; align-items:start; }
+
+    .complete-card {
+      position:relative;
+      min-width:0;
+      box-sizing:border-box;
+      background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+      border:1px solid rgba(255,255,255,.11);
+      border-radius:18px;
+      padding:20px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+      opacity:0;
+      transform:translateY(18px) scale(.985);
+      animation:cardEnter .55s cubic-bezier(.2,.75,.25,1) forwards;
+      transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+    .complete-card::before {
+      content:"";
+      position:absolute;
+      inset:0 0 auto 0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#00ff88,transparent);
+      opacity:.55;
+    }
+    .complete-card:hover {
+      transform:translateY(-5px);
+      border-color:rgba(0,255,136,.28);
+      box-shadow:0 16px 38px rgba(0,0,0,.28),0 0 24px rgba(0,255,136,.05);
+    }
+    @keyframes cardEnter { to { opacity:1; transform:translateY(0) scale(1); } }
+
+    .player-head { display:flex; align-items:center; gap:12px; min-width:0; padding-right:64px; }
+    .player-avatar {
+      width:44px; height:44px; flex:0 0 44px; border-radius:50%;
+      display:grid; place-items:center;
+      background:rgba(0,255,136,.1); border:1px solid rgba(0,255,136,.25);
+      color:#00ff88; font-weight:800; font-size:1rem;
+    }
+    .player-title { min-width:0; }
+    .player-title h3 { margin:0; color:#fff; font-size:1.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .player-subtitle { margin-top:3px; font-size:.72rem; opacity:.5; }
+
+    .average-badge {
+      position:absolute; top:16px; right:16px;
+      min-width:48px; padding:5px 7px; border-radius:9px;
+      text-align:center; background:rgba(0,255,136,.10);
+      border:1px solid rgba(0,255,136,.24); color:#00ff88;
+      line-height:1.05; box-shadow:0 0 14px rgba(0,255,136,.05);
+    }
+    .average-badge small { display:block; font-size:.55rem; opacity:.65; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
+    .average-badge strong { font-size:1rem; }
+
+    .api-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:18px; }
+    .stat { min-width:0; box-sizing:border-box; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.055); border-radius:9px; padding:8px 6px; text-align:center; }
+    .stat span { display:block; font-size:.66rem; opacity:.55; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .stat strong { display:block; color:#00ff88; margin-top:3px; font-size:.95rem; }
+
+    .technical-header { display:flex; justify-content:space-between; align-items:center; margin:18px 0 9px; }
+    .section-title { margin:0; font-size:.76rem; text-transform:uppercase; letter-spacing:.1em; opacity:.55; }
+    .evaluation-status { font-size:.66rem; color:#00ff88; opacity:.75; }
+
+    .tech-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+    .tech-grid .stat { padding:8px 3px; }
+    .tech-grid .stat span { font-size:.6rem; }
+    .tech-grid .stat strong { font-size:1rem; }
+
+    .chart-wrap { width:min(100%,260px); aspect-ratio:1/1; margin:10px auto 0; position:relative; }
+    .chart-wrap canvas { width:100%!important; height:100%!important; }
+
+    .missing { margin-top:18px; padding:13px; border-radius:10px; background:rgba(255,255,255,.035); border:1px dashed rgba(255,255,255,.1); font-size:.82rem; opacity:.6; text-align:center; }
+
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin:20px 0 10px; justify-content:center; }
+    .toolbar input { width:min(100%,390px); box-sizing:border-box; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; outline:none; transition:border-color .2s,box-shadow .2s; }
+    .toolbar input:focus { border-color:rgba(0,255,136,.45); box-shadow:0 0 0 3px rgba(0,255,136,.06); }
+    .status { text-align:center; opacity:.6; margin:14px 0 20px; font-size:.82rem; }
+
+    @media(max-width:760px) {
+      .complete-section { padding:1.2rem .75rem; }
+      .complete-grid { grid-template-columns:1fr; gap:16px; }
+      .complete-card { padding:17px; }
+    }
+    @media(max-width:390px) {
+      .api-grid { grid-template-columns:repeat(2,1fr); }
+      .tech-grid { grid-template-columns:repeat(3,1fr); }
+      .chart-wrap { width:min(100%,230px); }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .complete-card { animation:none; opacity:1; transform:none; transition:none; }
+    }
   </style>
 </head>
 <body>
@@ -54,7 +126,7 @@
     <section class="complete-section">
       <header class="section-header">
         <h2>Desempenho Completo</h2>
-        <p style="text-align:center;opacity:.7;margin-top:10px">Dados da API + avaliação técnica individual</p>
+        <p style="text-align:center;opacity:.65;margin-top:10px">Estatísticas e avaliação técnica dos jogadores</p>
       </header>
       <div class="toolbar">
         <input id="searchPlayer" type="search" placeholder="Buscar jogador..." autocomplete="off">
