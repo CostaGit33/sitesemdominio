@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v28";
+const CACHE_NAME = "futpontos-v27";
 
 const STATIC_ASSETS = [
   "/",
@@ -55,7 +55,7 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Arquivos de navegação e dados críticos sempre verificam a rede primeiro.
+  // Navegação e arquivos críticos verificam a versão publicada na rede primeiro.
   if (
     request.headers.get("accept")?.includes("text/html") ||
     [
