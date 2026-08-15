@@ -15,8 +15,7 @@ function normalizarNome(nome = "") {
     .replace(/[^a-z0-9]/g, "");
 }
 
-// A avaliação técnica é uma fonte independente da API.
-// A API define QUEM aparece; desempenho_data.js define QUEM possui avaliação.
+// A API define quais jogadores aparecem. A avaliação é opcional e independente.
 const indiceTecnico = Object.fromEntries(
   Object.entries(desempenhoJogadores).map(([nome, stats]) => [
     normalizarNome(nome),
@@ -25,7 +24,8 @@ const indiceTecnico = Object.fromEntries(
 );
 
 function obterAvaliacao(nome) {
-  const registro = indiceTecnico[normalizarNome(nome)];
+  const chave = normalizarNome(nome);
+  const registro = indiceTecnico[chave];
   return registro?.stats ? registro : null;
 }
 
@@ -54,17 +54,15 @@ function renderizar(lista) {
   container.innerHTML = "";
 
   if (!lista.length) {
-    container.innerHTML = "<p class=\"status\">Nenhum jogador encontrado.</p>";
+    container.innerHTML = '<p class="status">Nenhum jogador encontrado.</p>';
     return;
   }
 
   lista.forEach((j, index) => {
-    // IMPORTANTE: nunca filtramos jogadores pela avaliação.
-    // Se veio da API, ele aparece. A avaliação é opcional.
     const avaliacao = obterAvaliacao(j.nome);
     const stats = avaliacao?.stats || null;
     const media = stats
-      ? stats.reduce((total, valor) => total + numero(valor), 0) / 5
+      ? stats.reduce((total, valor) => total + numero(valor), 0) / stats.length
       : null;
     const canvasId = `complete_chart_${j.id ?? index}`;
     const card = document.createElement("article");
@@ -148,14 +146,20 @@ async function carregar() {
       throw new Error("Resposta inválida da API: esperado um array de jogadores.");
     }
 
-    // NÃO filtramos pela avaliação técnica.
-    // Todos os jogadores retornados pela API entram na página.
     jogadores = dados.map(j => ({
       ...j,
       nome: j.nome ?? j.name ?? "Jogador sem nome"
     }));
 
     status.textContent = `${jogadores.length} jogadores carregados pela API.`;
+
+    // Ajuda a identificar qualquer divergência de nome sem impedir a exibição.
+    jogadores.forEach(j => {
+      if (!obterAvaliacao(j.nome)) {
+        console.warn(`[Desempenho] Sem avaliação para o jogador da API: "${j.nome}"`);
+      }
+    });
+
     aplicarFiltro();
   } catch (error) {
     console.error("Erro ao carregar desempenho completo:", error);
