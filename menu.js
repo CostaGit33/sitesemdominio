@@ -68,10 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" })
-        .then(registration => registration.update())
-        .catch(error => console.error("Erro ao registrar Service Worker:", error));
+    window.addEventListener("load", async () => {
+      try {
+        // A versão na URL obriga o navegador a buscar o SW atual.
+        const registration = await navigator.serviceWorker.register("/sw.js?v=36", {
+          scope: "/",
+          updateViaCache: "none"
+        });
+        await registration.update();
+      } catch (error) {
+        console.error("Erro ao registrar Service Worker:", error);
+      }
     });
   }
 
