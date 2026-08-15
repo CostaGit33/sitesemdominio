@@ -1,7 +1,7 @@
 ﻿{
   "name": "FutPontos",
   "short_name": "FutPontos",
-  "description": "Classificação geral e ranking visual da pelada.",
+  "description": "Classificação geral, ranking e desempenho completo dos jogadores.",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
@@ -23,6 +23,19 @@
     }
   ],
   "categories": ["sports", "games"],
-  "lang": "pt-BR"
+  "lang": "pt-BR",
+  "shortcuts": [
+    {
+      "name": "Desempenho Completo",
+      "short_name": "Desempenho Completo",
+      "description": "Dados da API + avaliação técnica individual.",
+      "url": "/desempenho-completo.html",
+      "icons": [
+        {
+          "src": "futponts_large.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }
-
