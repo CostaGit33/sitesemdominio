@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v33";
+const CACHE_NAME = "futpontos-v34";
 
 const STATIC_ASSETS = [
   "/",
@@ -39,11 +39,9 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys
-        .filter(key => key !== CACHE_NAME)
-        .map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+    )).then(() => self.clients.claim())
   );
 });
 
@@ -54,24 +52,10 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const alwaysFresh = request.headers.get("accept")?.includes("text/html") || [
-    "/globais.js",
-    "/menu.js",
-    "/classificacao.js",
-    "/goleiros.js",
-    "/desempenho.js",
-    "/desempenho-completo.js",
-    "/analise-semana.js",
-    "/topo.js",
-    "/videos.js",
-    "/jogador.js",
-    "/desempenho_data.js",
-    "/classificacao.css",
-    "/common-nav.css",
-    "/responsive-mobile.css",
-    "/globais.css",
-    "/manifest.json"
-  ].includes(url.pathname);
+  const alwaysFresh =
+    request.mode === "navigate" ||
+    request.headers.get("accept")?.includes("text/html") ||
+    /\.(js|css|json)$/i.test(url.pathname);
 
   if (alwaysFresh) {
     event.respondWith(
@@ -88,11 +72,14 @@ self.addEventListener("fetch", event => {
   }
 
   event.respondWith(
-    caches.match(request).then(cached => cached || fetch(request).then(response => {
-      if (response?.ok) {
-        caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
-      }
-      return response;
-    }))
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+      return fetch(request).then(response => {
+        if (response?.ok) {
+          caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        }
+        return response;
+      });
+    })
   );
 });
