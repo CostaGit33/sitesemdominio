@@ -1,10 +1,11 @@
-const CACHE_NAME = "futpontos-v24";
+const CACHE_NAME = "futpontos-v25";
 
 const STATIC_ASSETS = [
   "/",
   "/index.html",
   "/goleiros.html",
   "/desempenho.html",
+  "/desempenho-completo.html",
   "/analise-semana.html",
   "/topo.html",
   "/videos.html",
@@ -20,6 +21,7 @@ const STATIC_ASSETS = [
   "/desempenho_data.js",
   "/goleiros.js",
   "/desempenho.js",
+  "/desempenho-completo.js",
   "/analise-semana.js",
   "/topo.js",
   "/videos.js",
@@ -40,9 +42,7 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -50,16 +50,14 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const request = event.request;
-
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-
   if (url.origin !== self.location.origin) return;
 
   if (
     request.headers.get("accept")?.includes("text/html") ||
-    ["/desempenho_data.js", "/desempenho.js", "/sw.js"].includes(url.pathname)
+    ["/desempenho_data.js", "/desempenho.js", "/desempenho-completo.js", "/desempenho-completo.html", "/sw.js"].includes(url.pathname)
   ) {
     event.respondWith(
       fetch(request, { cache: "no-store" })
@@ -79,7 +77,7 @@ self.addEventListener("fetch", event => {
     caches.match(request).then(cached => {
       const networkFetch = fetch(request)
         .then(response => {
-          if (response && response.ok) {
+          if (response?.ok) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
           }
