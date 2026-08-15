@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v32";
+const CACHE_NAME = "futpontos-v33";
 
 const STATIC_ASSETS = [
   "/",
@@ -12,7 +12,6 @@ const STATIC_ASSETS = [
   "/jogador.html",
   "/classificacao.css",
   "/common-nav.css",
-  "/commom-nav.css",
   "/responsive-mobile.css",
   "/globais.css",
   "/globais.js",
@@ -41,9 +40,9 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      ))
+      .then(keys => Promise.all(keys
+        .filter(key => key !== CACHE_NAME)
+        .map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -55,27 +54,31 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // HTML e arquivos ligados ao desempenho usam sempre a versão mais recente.
-  if (
-    request.headers.get("accept")?.includes("text/html") ||
-    [
-      "/menu.js",
-      "/desempenho_data.js",
-      "/desempenho.js",
-      "/desempenho-completo.js",
-      "/desempenho-completo.html",
-      "/classificacao.css",
-      "/common-nav.css",
-      "/manifest.json",
-      "/sw.js"
-    ].includes(url.pathname)
-  ) {
+  const alwaysFresh = request.headers.get("accept")?.includes("text/html") || [
+    "/globais.js",
+    "/menu.js",
+    "/classificacao.js",
+    "/goleiros.js",
+    "/desempenho.js",
+    "/desempenho-completo.js",
+    "/analise-semana.js",
+    "/topo.js",
+    "/videos.js",
+    "/jogador.js",
+    "/desempenho_data.js",
+    "/classificacao.css",
+    "/common-nav.css",
+    "/responsive-mobile.css",
+    "/globais.css",
+    "/manifest.json"
+  ].includes(url.pathname);
+
+  if (alwaysFresh) {
     event.respondWith(
       fetch(request, { cache: "no-store" })
         .then(response => {
           if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+            caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
           }
           return response;
         })
@@ -85,18 +88,11 @@ self.addEventListener("fetch", event => {
   }
 
   event.respondWith(
-    caches.match(request).then(cached => {
-      const networkFetch = fetch(request)
-        .then(response => {
-          if (response?.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-
-      return cached || networkFetch;
-    })
+    caches.match(request).then(cached => cached || fetch(request).then(response => {
+      if (response?.ok) {
+        caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+      }
+      return response;
+    }))
   );
 });
