@@ -57,18 +57,36 @@
     #completeContainer .missing { margin-top:18px; padding:13px; border-radius:10px; background:rgba(255,255,255,.035); border:1px dashed rgba(255,255,255,.1); font-size:.82rem; opacity:.6; text-align:center; }
 
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin:20px 0 10px; justify-content:center; }
-    .toolbar input { width:min(100%,390px); box-sizing:border-box; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; outline:none; transition:border-color .2s,box-shadow .2s; }
+    .toolbar input { width:min(100%,390px); box-sizing:border-box; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; outline:none; }
     .toolbar input:focus { border-color:rgba(0,255,136,.45); box-shadow:0 0 0 3px rgba(0,255,136,.06); }
     .status { text-align:center; opacity:.6; margin:14px 0 20px; font-size:.82rem; }
 
+    /* evita colisão com estilos antigos: esconde os cards .player-card dentro do container novo */
+    #completeContainer .player-card { display: none !important; }
+
     @media(max-width:760px) { .complete-section { padding:1.2rem .75rem; } #completeContainer.complete-grid { grid-template-columns:1fr; gap:16px; } #completeContainer .complete-card { padding:17px; } }
-    @media(max-width:390px) { #completeContainer .api-grid { grid-template-columns:repeat(2,1fr); } #completeContainer .tech-grid { grid-template-columns:repeat(3,1fr); } #completeContainer .chart-wrap { width:min(100%,230px); } }
+    @media(max-width:390px) { #completeContainer .api-grid { grid-template-columns:repeat(2,1fr); } #completeContainer .tech-grid { grid-template-columns:repeat(3,1fr); } #completeContainer .chart-wrap { width:100%; } }
     @media(prefers-reduced-motion:reduce) { #completeContainer .complete-card { animation:none; opacity:1; transform:none; transition:none; } }
   </style>
 </head>
 <body>
-  <header class="app-header"><div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo"></div><button class="menu-toggle" aria-label="Abrir menu">☰</button><nav class="app-nav" aria-label="Navegação principal"><ul><li><a href="index.html">Classificação</a></li><li><a href="goleiros.html">Goleiros</a></li><li><a href="desempenho.html">Desempenho</a></li><li><a href="desempenho-completo.html">Desempenho Completo</a></li><li><a href="analise-semana.html">Análises</a></li><li><a href="topo.html">Topos</a></li><li><a href="videos.html" target="_blank">Vídeos</a></li></ul></nav></header>
-  <main class="app-main"><section class="complete-section"><header class="section-header"><h2>Desempenho Completo</h2><p style="text-align:center;opacity:.65;margin-top:10px">Estatísticas e avaliação técnica dos jogadores</p></header><div class="toolbar"><input id="searchPlayer" type="search" placeholder="Buscar jogador..." autocomplete="off"></div><div id="completeStatus" class="status">Carregando jogadores...</div><div id="completeContainer" class="complete-grid"></div></section></main>
-  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer><div id="feedback" aria-live="polite"></div>
+  <header class="app-header"><div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo"></div><button class="menu-toggle" aria-label="Abrir menu">☰</button><nav class="app-nav" aria-label="Navegação principal"><ul><li><a href="index.html">Classificação</a></li><li><a href="goleiros.html">Goleiros</a></li><li><a href="desempenho.html" class="active">Desempenho</a></li><li><a href="analise-semana.html">Análises</a></li><li><a href="topo.html">Topos</a></li><li><a href="videos.html" target="_blank" rel="noopener noreferrer">Vídeos</a></li></ul></nav></header>
+  <main class="app-main">
+    <section class="complete-section">
+      <header class="section-header"><h2>Desempenho Completo</h2><p style="text-align:center;opacity:.65;margin-top:10px">Estatísticas e avaliação técnica dos jogadores</p></header>
+
+      <!-- ADICIONADO: toolbar, status e container para os cards (necessários por desempenho-completo.js) -->
+      <div class="toolbar" style="justify-content:center; margin-bottom:12px;">
+        <input id="searchPlayer" placeholder="Buscar jogador..." aria-label="Buscar jogador" />
+      </div>
+
+      <div id="completeStatus" class="status">Carregando desempenho...</div>
+
+      <div id="completeContainer" class="complete-grid" aria-live="polite" role="list"></div>
+
+    </section>
+  </main>
+  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer>
+  <div id="feedback" aria-live="polite"></div>
   <script type="module" src="globais.js"></script><script src="menu.js"></script><script type="module" src="desempenho-completo.js"></script>
 </body></html>
