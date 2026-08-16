@@ -11,13 +11,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const installConfirm = document.getElementById("install-confirm");
   const installDismiss = document.getElementById("install-dismiss");
   const INSTALL_KEY = "fp_install_dismissed";
-  const SW_RESET_KEY = "fp_sw_reset_v37";
+  const SW_RESET_KEY = "fp_sw_reset_v38";
   let installPromptEvent = null;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
+  // O item é injetado aqui para manter a nova opção sincronizada em todas as páginas.
   if (appNav) {
+    const ul = appNav.querySelector("ul");
+    if (ul && !ul.querySelector('a[href="montar-times.html"]')) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = "montar-times.html";
+      a.textContent = "Montar Times";
+      li.appendChild(a);
+      const videos = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "videos.html");
+      if (videos?.parentElement) ul.insertBefore(li, videos.parentElement);
+      else ul.appendChild(li);
+    }
+
     appNav.querySelectorAll("a").forEach(link => {
       const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
       const isCurrent = href === currentPage || (currentPage === "index.html" && href === "index.html");
@@ -33,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isMobile()) appNav.style.display = "none";
     menuToggle?.setAttribute("aria-expanded", "false");
   };
-
   const openMenu = () => {
     if (!appNav) return;
     appNav.classList.add("active");
@@ -45,26 +56,20 @@ document.addEventListener("DOMContentLoaded", () => {
     appNav.id = appNav.id || "main-nav";
     menuToggle.setAttribute("aria-controls", appNav.id);
     menuToggle.setAttribute("aria-expanded", "false");
-
     menuToggle.addEventListener("click", event => {
       event.stopPropagation();
       appNav.classList.contains("active") ? closeMenu() : openMenu();
     });
-
     appNav.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
-
     document.addEventListener("click", event => {
       if (!appNav.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
     });
-
     window.addEventListener("resize", () => {
       if (!isMobile()) {
         appNav.style.display = "";
         appNav.classList.remove("active");
         menuToggle.setAttribute("aria-expanded", "false");
-      } else if (!appNav.classList.contains("active")) {
-        appNav.style.display = "none";
-      }
+      } else if (!appNav.classList.contains("active")) appNav.style.display = "none";
     });
   }
 
@@ -72,51 +77,26 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", async () => {
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
-
-        // Remove versões antigas que possam estar presas no navegador.
-        // Executa somente uma vez por instalação do site.
         if (!sessionStorage.getItem(SW_RESET_KEY)) {
           sessionStorage.setItem(SW_RESET_KEY, "1");
           await Promise.all(registrations.map(reg => reg.unregister()));
-
-          // Garante que a página seja recarregada sem o SW antigo controlando-a.
           window.location.reload();
           return;
         }
-
-        const registration = await navigator.serviceWorker.register("/sw.js?v=37", {
-          scope: "/",
-          updateViaCache: "none"
-        });
+        const registration = await navigator.serviceWorker.register("/sw.js?v=38", { scope: "/", updateViaCache: "none" });
         await registration.update();
-      } catch (error) {
-        console.error("Erro ao registrar Service Worker:", error);
-      }
+      } catch (error) { console.error("Erro ao registrar Service Worker:", error); }
     });
   }
 
   window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault();
-    installPromptEvent = event;
+    event.preventDefault(); installPromptEvent = event;
     if (installBanner && !localStorage.getItem(INSTALL_KEY)) installBanner.classList.add("visible");
   });
-
-  window.addEventListener("appinstalled", () => {
-    installPromptEvent = null;
-    installBanner?.classList.remove("visible");
-    localStorage.removeItem(INSTALL_KEY);
-  });
-
+  window.addEventListener("appinstalled", () => { installPromptEvent = null; installBanner?.classList.remove("visible"); localStorage.removeItem(INSTALL_KEY); });
   installConfirm?.addEventListener("click", async () => {
     if (!installPromptEvent) return;
-    installPromptEvent.prompt();
-    await installPromptEvent.userChoice;
-    installPromptEvent = null;
-    installBanner?.classList.remove("visible");
+    installPromptEvent.prompt(); await installPromptEvent.userChoice; installPromptEvent = null; installBanner?.classList.remove("visible");
   });
-
-  installDismiss?.addEventListener("click", () => {
-    localStorage.setItem(INSTALL_KEY, String(Date.now()));
-    installBanner?.classList.remove("visible");
-  });
+  installDismiss?.addEventListener("click", () => { localStorage.setItem(INSTALL_KEY, String(Date.now())); installBanner?.classList.remove("visible"); });
 });
