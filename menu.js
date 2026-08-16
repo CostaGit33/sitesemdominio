@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const installConfirm = document.getElementById("install-confirm");
   const installDismiss = document.getElementById("install-dismiss");
   const INSTALL_KEY = "fp_install_dismissed";
-  const SW_RESET_KEY = "fp_sw_reset_v39";
+  const SW_RESET_KEY = "fp_sw_reset_v50";
   let installPromptEvent = null;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.reload();
           return;
         }
-        const registration = await navigator.serviceWorker.register("/sw.js?v=39", { scope: "/", updateViaCache: "none" });
+        const registration = await navigator.serviceWorker.register("/sw.js?v=50", { scope: "/", updateViaCache: "none" });
         await registration.update();
       } catch (error) { console.error("Erro ao registrar Service Worker:", error); }
     });
