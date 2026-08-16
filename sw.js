@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v42";
+const CACHE_NAME = "futpontos-v43";
 
 const STATIC_ASSETS = [
   "/futponts_large.png",
