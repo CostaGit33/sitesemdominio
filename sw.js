@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v38";
+const CACHE_NAME = "futpontos-v39";
 
 // HTML, CSS e JavaScript permanecem sempre em rede para evitar versões antigas.
 const STATIC_ASSETS = [
@@ -17,7 +17,11 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+    await Promise.all(
+      keys
+        .filter(key => key !== CACHE_NAME)
+        .map(key => caches.delete(key))
+    );
     await self.clients.claim();
   })());
 });
@@ -29,6 +33,7 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // HTML, CSS e JS precisam refletir imediatamente as alterações do projeto.
   const liveFile =
     request.mode === "navigate" ||
     request.headers.get("accept")?.includes("text/html") ||
@@ -46,5 +51,8 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  event.respondWith(fetch(request).catch(() => caches.match(request)));
+  // Demais recursos usam rede primeiro e cache apenas como fallback.
+  event.respondWith(
+    fetch(request).catch(() => caches.match(request))
+  );
 });
