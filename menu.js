@@ -11,44 +11,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const installConfirm = document.getElementById("install-confirm");
   const installDismiss = document.getElementById("install-dismiss");
   const INSTALL_KEY = "fp_install_dismissed";
-  const SW_RESET_KEY = "fp_sw_reset_v38";
+  const SW_RESET_KEY = "fp_sw_reset_v39";
   let installPromptEvent = null;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // A opção é injetada centralmente para manter todas as páginas sincronizadas.
+  // O item Montar Times é injetado centralmente para que todas as páginas
+  // que usam o menu compartilhem exatamente a mesma navegação.
   if (appNav) {
     const ul = appNav.querySelector("ul");
-    if (ul && !ul.querySelector('a[href="montar-times.html"]')) {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = "montar-times.html";
-      a.textContent = "Montar Times";
-      li.appendChild(a);
-
-      const desempenhoCompleto = [...ul.querySelectorAll("a")].find(
-        link => link.getAttribute("href") === "desempenho-completo.html"
-      );
-      const videos = [...ul.querySelectorAll("a")].find(
-        link => link.getAttribute("href") === "videos.html"
-      );
-
-      if (desempenhoCompleto?.parentElement) {
-        desempenhoCompleto.parentElement.after(li);
-      } else if (videos?.parentElement) {
-        ul.insertBefore(li, videos.parentElement);
-      } else {
-        ul.appendChild(li);
+    if (ul) {
+      if (!ul.querySelector('a[href="montar-times.html"]')) {
+        const li = document.createElement("li");
+        li.innerHTML = '<a href="montar-times.html">Montar Times</a>';
+        const desempenho = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "desempenho-completo.html");
+        const videos = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "videos.html");
+        if (desempenho?.parentElement) desempenho.parentElement.after(li);
+        else if (videos?.parentElement) ul.insertBefore(li, videos.parentElement);
+        else ul.appendChild(li);
       }
-    }
 
-    appNav.querySelectorAll("a").forEach(link => {
-      const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
-      const isCurrent = href === currentPage || (currentPage === "index.html" && href === "index.html");
-      link.classList.toggle("active", isCurrent);
-      if (isCurrent) link.setAttribute("aria-current", "page");
-      else link.removeAttribute("aria-current");
-    });
+      ul.querySelectorAll("a").forEach(link => {
+        const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
+        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "index.html");
+        link.classList.toggle("active", isCurrent);
+        if (isCurrent) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+    }
   }
 
   const closeMenu = () => {
@@ -95,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.reload();
           return;
         }
-        const registration = await navigator.serviceWorker.register("/sw.js?v=38", { scope: "/", updateViaCache: "none" });
+        const registration = await navigator.serviceWorker.register("/sw.js?v=39", { scope: "/", updateViaCache: "none" });
         await registration.update();
       } catch (error) { console.error("Erro ao registrar Service Worker:", error); }
     });
