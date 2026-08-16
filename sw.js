@@ -1,7 +1,6 @@
-const CACHE_NAME = "futpontos-v37";
+const CACHE_NAME = "futpontos-v38";
 
-// O Service Worker não armazena HTML, CSS ou JavaScript.
-// Esses arquivos devem sempre vir da publicação atual.
+// HTML, CSS e JavaScript permanecem sempre em rede para evitar versões antigas.
 const STATIC_ASSETS = [
   "/futponts_large.png",
   "/manifest.json"
@@ -18,7 +17,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -47,8 +46,5 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Para os demais recursos: rede primeiro, cache somente como fallback.
-  event.respondWith(
-    fetch(request).catch(() => caches.match(request))
-  );
+  event.respondWith(fetch(request).catch(() => caches.match(request)));
 });
