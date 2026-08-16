@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // O item é injetado aqui para manter a nova opção sincronizada em todas as páginas.
+  // A opção é injetada centralmente para manter todas as páginas sincronizadas.
   if (appNav) {
     const ul = appNav.querySelector("ul");
     if (ul && !ul.querySelector('a[href="montar-times.html"]')) {
@@ -25,9 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
       a.href = "montar-times.html";
       a.textContent = "Montar Times";
       li.appendChild(a);
-      const videos = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "videos.html");
-      if (videos?.parentElement) ul.insertBefore(li, videos.parentElement);
-      else ul.appendChild(li);
+
+      const desempenhoCompleto = [...ul.querySelectorAll("a")].find(
+        link => link.getAttribute("href") === "desempenho-completo.html"
+      );
+      const videos = [...ul.querySelectorAll("a")].find(
+        link => link.getAttribute("href") === "videos.html"
+      );
+
+      if (desempenhoCompleto?.parentElement) {
+        desempenhoCompleto.parentElement.after(li);
+      } else if (videos?.parentElement) {
+        ul.insertBefore(li, videos.parentElement);
+      } else {
+        ul.appendChild(li);
+      }
     }
 
     appNav.querySelectorAll("a").forEach(link => {
