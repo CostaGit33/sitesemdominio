@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v45";
+const CACHE_NAME = "futpontos-v50";
 
 const STATIC_ASSETS = [
   "/futponts_large.png",
@@ -26,10 +26,26 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  const liveFile = request.mode === "navigate" || request.headers.get("accept")?.includes("text/html") || /\.(html|js|css)$/i.test(url.pathname);
+
+  // HTML, JS e CSS devem sempre vir da rede para impedir que uma versão
+  // antiga do projeto reapareça depois de um reload/atualização.
+  const liveFile = request.mode === "navigate" ||
+    request.headers.get("accept")?.includes("text/html") ||
+    /\.(html|js|css)$/i.test(url.pathname);
+
   if (liveFile) {
-    event.respondWith(fetch(request, { cache: "no-store" }).catch(() => caches.match(request).then(cached => cached || new Response("Sem conexão para carregar esta página.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } })));
+    event.respondWith(
+      fetch(request, { cache: "no-store" }).catch(() =>
+        caches.match(request).then(cached =>
+          cached || new Response("Sem conexão para carregar esta página.", {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+          })
+        )
+      )
+    );
     return;
   }
+
   event.respondWith(fetch(request).catch(() => caches.match(request)));
 });
