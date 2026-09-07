@@ -3,7 +3,7 @@ import { apiRequest, showFeedback, calculatePoints } from "./globais.js";
 const stateEl = document.getElementById("playerState");
 const profileEl = document.getElementById("playerProfile");
 const params = new URLSearchParams(window.location.search);
-const selectedId = params.get("id");
+const selectedId = ["id", "jogador_id", "player_id", "jogador"].map(key => params.get(key)).find(value => value !== null && value.trim() !== "") || null;
 const fields = [["pontos", "Pontos"], ["gols", "Gols"], ["defesa", "Defesas"], ["vitorias", "Vitórias"], ["empate", "Empates"], ["infracoes", "Infrações"]];
 
 function n(value) { const result = Number(value); return Number.isFinite(result) ? Math.max(0, result) : 0; }
@@ -27,5 +27,5 @@ function renderProfile(player, performance) {
   document.getElementById("sharePlayer")?.addEventListener("click", async event => { try { await navigator.clipboard.writeText(location.href); event.target.textContent = "Link copiado"; } catch { showFeedback("Copie o endereço do navegador para compartilhar.", "error"); } });
 }
 
-async function load() { try { const [players, performance] = await Promise.all([apiRequest("/jogadores"), apiRequest("/desempenho").catch(() => [])]); const player = selectedId ? players.find(item => String(item.id) === String(selectedId)) : null; if (selectedId && !player) throw new Error("Jogador não encontrado."); player ? renderProfile(player, performance) : renderList(players); } catch (error) { stateEl.textContent = error.message || "Erro ao carregar dados."; stateEl.className = "player-error"; } }
+async function load() { try { const [players, performance] = await Promise.all([apiRequest("/jogadores"), apiRequest("/desempenho").catch(() => [])]); const normalizedId = selectedId ? decodeURIComponent(selectedId).trim().replace(/^#/, "") : null; const player = normalizedId ? players.find(item => String(item.id) === normalizedId) : null; if (normalizedId && !player) { renderList(players); const notice = document.createElement("p"); notice.className = "profile-notice"; notice.textContent = `Jogador ${normalizedId} não encontrado. Selecione um jogador abaixo.`; profileEl.prepend(notice); return; } player ? renderProfile(player, performance) : renderList(players); } catch (error) { stateEl.textContent = error.message || "Erro ao carregar dados."; stateEl.className = "player-error"; } }
 load();
