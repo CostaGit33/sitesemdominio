@@ -8,7 +8,7 @@ const fields = [["pontos", "Pontos"], ["gols", "Gols"], ["defesa", "Defesas"], [
 
 function n(value) { const result = Number(value); return Number.isFinite(result) ? Math.max(0, result) : 0; }
 function esc(value) { return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]); }
-function image(player, className) { return `<img class="${className}" src="${esc(player.foto || "futponts_large.png")}" alt="Foto de ${esc(player.nome)}" width="170" height="170" loading="lazy" style="display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='futponts_large.png'">`; }
+function image(player, className) { const size = className === "hero-photo" ? "min(170px, 100%)" : "54px"; return `<img class="${className}" src="${esc(player.foto || "futponts_large.png")}" alt="Foto de ${esc(player.nome)}" width="170" height="170" loading="lazy" style="display:block;width:${size};height:${size};max-width:${size};max-height:${size};object-fit:cover;border-radius:50%;" onerror="this.src='futponts_large.png'">`; }
 function technical(player, performance) { return performance.find(item => String(item.id) === String(player.id))?.avaliacao || {}; }
 
 function renderList(players) {
