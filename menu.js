@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const installConfirm = document.getElementById("install-confirm");
   const installDismiss = document.getElementById("install-dismiss");
   const INSTALL_KEY = "fp_install_dismissed";
-  const SW_RESET_KEY = "fp_sw_reset_v56";
+  const SW_RESET_KEY = "fp_sw_reset_v57";
   let installPromptEvent = null;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -34,14 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!ul.querySelector('a[href="jogador.html"]')) {
         const li = document.createElement("li");
         li.innerHTML = '<a href="jogador.html">Perfis</a>';
-        const classificacao = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "index.html");
+        const classificacao = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "classificacao.html");
         if (classificacao?.parentElement) classificacao.parentElement.after(li);
         else ul.appendChild(li);
       }
 
       ul.querySelectorAll("a").forEach(link => {
         const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
-        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "index.html");
+        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "jogador.html") || (currentPage === "classificacao.html" && href === "classificacao.html");
         link.classList.toggle("active", isCurrent);
         if (isCurrent) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.reload();
           return;
         }
-        const registration = await navigator.serviceWorker.register("/sw.js?v=56", { scope: "/", updateViaCache: "none" });
+        const registration = await navigator.serviceWorker.register("/sw.js?v=57", { scope: "/", updateViaCache: "none" });
         await registration.update();
       } catch (error) { console.error("Erro ao registrar Service Worker:", error); }
     });
