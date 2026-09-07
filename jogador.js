@@ -1,125 +1,31 @@
 import { apiRequest, showFeedback, calculatePoints } from "./globais.js";
 
-/* ======================================================
-   UTIL
-====================================================== */
-
-function getPlayerIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id");
-}
-
-
-/* ======================================================
-   ELEMENTOS
-====================================================== */
-
-const stateEl   = document.getElementById("playerState");
+const stateEl = document.getElementById("playerState");
 const profileEl = document.getElementById("playerProfile");
+const params = new URLSearchParams(window.location.search);
+const selectedId = params.get("id");
+const fields = [["pontos", "Pontos"], ["gols", "Gols"], ["defesa", "Defesas"], ["vitorias", "Vitórias"], ["empate", "Empates"], ["infracoes", "Infrações"]];
 
-const nameEl    = document.getElementById("playerName");
-const pointsEl  = document.getElementById("playerPoints");
+function n(value) { const result = Number(value); return Number.isFinite(result) ? Math.max(0, result) : 0; }
+function esc(value) { return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]); }
+function image(player, className) { return `<img class="${className}" src="${esc(player.foto || "futponts_large.png")}" alt="Foto de ${esc(player.nome)}" onerror="this.src='futponts_large.png'">`; }
+function technical(player, performance) { return performance.find(item => String(item.id) === String(player.id))?.avaliacao || {}; }
 
-const statV     = document.getElementById("statVitorias");
-const statG     = document.getElementById("statGols");
-const statD     = document.getElementById("statDefesas");
-const statE     = document.getElementById("statEmpates");
-const statI     = document.getElementById("statInfracoes");
-
-const photoEl   = document.getElementById("playerPhoto");
-const editBtn   = document.getElementById("editPlayerBtn");
-
-/* ======================================================
-   LOAD PLAYER
-====================================================== */
-
-async function loadPlayer() {
-  const id = getPlayerIdFromURL();
-
-  if (!id) {
-    showError("Jogador não encontrado.");
-    return;
-  }
-
-  try {
-    const jogadores = await apiRequest("/jogadores");
-
-    if (!Array.isArray(jogadores)) {
-      throw new Error("Resposta inválida da API");
-    }
-
-    const player = jogadores.find(j => String(j.id) === String(id));
-
-    if (!player) {
-      showError("Jogador não encontrado.");
-      return;
-    }
-
-    renderPlayer(player);
-
-  } catch (err) {
-    console.error(err);
-    showError("Erro ao carregar dados do jogador.");
-  }
+function renderList(players) {
+  stateEl.hidden = true; profileEl.hidden = false;
+  profileEl.innerHTML = `<section class="players-hero"><p class="eyebrow">FUTPONTOS / PLANTEL</p><h1>Perfis dos jogadores</h1><p>Escolha um jogador para consultar seus dados e avaliações disponíveis.</p><div class="list-tabs"><button class="active" data-key="pontos">Ranking geral</button><button data-key="gols">Marcadores</button><button data-key="defesa">Defesas</button><button data-key="vitorias">Vitórias</button></div></section><section class="players-list" id="playersList"></section>`;
+  const list = document.getElementById("playersList");
+  const draw = key => { const ordered = [...players].sort((a, b) => n(b[key]) - n(a[key])); list.innerHTML = ordered.map((player, index) => `<a class="player-row" href="jogador.html?id=${encodeURIComponent(player.id)}"><span class="player-rank">${index + 1}</span>${image(player, "player-thumb")}<span class="player-copy"><strong>${esc(player.nome)}</strong><small>Jogador #${esc(player.id)} · ${n(player.pontos)} pontos</small></span><span class="player-score"><strong>${n(player[key])}</strong><small>${key === "pontos" ? "PONTOS" : key.toUpperCase()}</small></span><span class="row-arrow">›</span></a>`).join("") || `<div class="empty-state">Nenhum jogador cadastrado.</div>`; document.querySelectorAll(".list-tabs button").forEach(button => button.classList.toggle("active", button.dataset.key === key)); };
+  document.querySelectorAll(".list-tabs button").forEach(button => button.addEventListener("click", () => draw(button.dataset.key))); draw("pontos");
 }
 
-/* ======================================================
-   RENDER
-====================================================== */
-
-function renderPlayer(p) {
-  // Estado
-  if (stateEl) stateEl.hidden = true;
-  if (profileEl) profileEl.hidden = false;
-
-  // Nome
-  nameEl.textContent = p.nome;
-
-  // Pontos recalculados (fonte da verdade)
-  const pontosCalculados = calculatePoints(p.vitorias, p.empate, p.defesa, p.gols, p.infracoes);
-  pointsEl.textContent = pontosCalculados;
-
-  // Estatísticas
-  statV.textContent = Number(p.vitorias)  || 0;
-  statG.textContent = Number(p.gols)      || 0;
-  statD.textContent = Number(p.defesa)    || 0;
-  statE.textContent = Number(p.empate)    || 0;
-  statI.textContent = Number(p.infracoes) || 0;
-
-  // Foto segura
-  photoEl.src = p.foto || "futponts_large.png";
-  photoEl.alt = `Foto de ${p.nome}`;
-
-  // Link para edição
-  if (editBtn) {
-    editBtn.href = `adicionar.html?id=${p.id}`;
-  }
+function renderProfile(player, performance) {
+  const tech = technical(player, performance); const stats = fields.map(([key, label]) => ({ key, label, value: n(player[key]) })); const max = Math.max(1, ...stats.map(item => item.value));
+  stateEl.hidden = true; profileEl.hidden = false; document.title = `${player.nome} | FutPontos`;
+  const techFields = [["defesa", "Defesa"], ["ataque", "Ataque"], ["velocidade", "Velocidade"], ["habilidade", "Habilidade"], ["passe", "Passe"]].filter(([key]) => tech[key] !== undefined && tech[key] !== null);
+  profileEl.innerHTML = `<section class="player-hero">${image(player, "hero-photo")}<div class="hero-copy"><p class="eyebrow">PERFIL DO JOGADOR / #${esc(player.id)}</p><h1>${esc(player.nome)}</h1><p>Dados reais do FutPontos</p><div class="hero-actions"><a href="jogador.html" class="light-button">← Todos os jogadores</a><button id="sharePlayer" class="ghost-button">Compartilhar</button></div></div><div class="hero-points"><span>PONTOS</span><strong>${n(player.pontos || calculatePoints(player.vitorias, player.empate, player.defesa, player.gols, player.infracoes))}</strong></div></section><nav class="profile-tabs" aria-label="Seções do jogador"><a class="active" href="#geral">Visão geral</a><a href="#estatisticas">Estatísticas</a><a href="#avaliacao">Avaliação técnica</a></nav><section class="profile-section" id="geral"><p class="eyebrow">VISÃO GERAL</p><h2>Resumo do jogador</h2><div class="stats-grid">${stats.map(item => `<article class="stat-box ${item.key === "pontos" ? "featured" : ""}"><strong>${item.value}</strong><span>${item.label}</span></article>`).join("")}</div></section><section class="split-section" id="estatisticas"><div class="data-card"><p class="eyebrow">DESEMPENHO ACUMULADO</p><h2>Indicadores</h2>${stats.map(item => `<div class="metric-row"><div><span>${item.label}</span><strong>${item.value}</strong></div><div class="metric-track"><i style="width:${Math.round((item.value / max) * 100)}%"></i></div></div>`).join("")}</div><div class="data-card" id="avaliacao"><p class="eyebrow">DADOS TÉCNICOS</p><h2>Perfil de jogo</h2>${techFields.length ? techFields.map(([key, label]) => `<div class="tech-row"><span>${label}</span><strong>${n(tech[key])}</strong><div><i style="width:${Math.min(100, n(tech[key]) * 5)}%"></i></div></div>`).join("") : `<p class="empty-technical">Nenhuma avaliação técnica cadastrada para este jogador.</p>`}</div></section><section class="profile-note"><div><p class="eyebrow">FONTE DOS DADOS</p><p>Esta página utiliza exclusivamente os dados retornados pela API. Informações que ainda não existem no sistema não são inventadas.</p></div><a href="index.html" class="ghost-button">Ver classificação →</a></section>`;
+  document.getElementById("sharePlayer")?.addEventListener("click", async event => { try { await navigator.clipboard.writeText(location.href); event.target.textContent = "Link copiado"; } catch { showFeedback("Copie o endereço do navegador para compartilhar.", "error"); } });
 }
 
-/* ======================================================
-   ERRO
-====================================================== */
-
-function showError(message) {
-  if (stateEl) {
-    stateEl.textContent = message;
-    stateEl.className = "player-error";
-    stateEl.hidden = false;
-  }
-  if (profileEl) {
-    profileEl.hidden = true;
-  }
-
-  showFeedback(message, "error");
-}
-
-/* ======================================================
-   INIT
-====================================================== */
-
-document.addEventListener("DOMContentLoaded", loadPlayer);
-
-console.info(
-  "%cFutPontos | Detalhes do Jogador ativo",
-  "color:#D62828;font-weight:bold;font-size:13px"
-);
+async function load() { try { const [players, performance] = await Promise.all([apiRequest("/jogadores"), apiRequest("/desempenho").catch(() => [])]); const player = selectedId ? players.find(item => String(item.id) === String(selectedId)) : null; if (selectedId && !player) throw new Error("Jogador não encontrado."); player ? renderProfile(player, performance) : renderList(players); } catch (error) { stateEl.textContent = error.message || "Erro ao carregar dados."; stateEl.className = "player-error"; } }
+load();
