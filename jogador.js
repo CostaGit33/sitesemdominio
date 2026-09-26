@@ -53,10 +53,12 @@ async function animarEntradaLista() {
   try {
     const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
     animate(elementos, {
-      y: [8, 0],
-      duration: 340,
-      delay: stagger(28),
-      ease: "out(3)"
+      opacity: [0, 1],
+      y: [30, 0],
+      scale: [0.96, 1],
+      duration: 720,
+      delay: stagger(42),
+      ease: "out(4)"
     });
   } catch (error) {
     console.warn("Anime.js não carregou; mantendo a lista estática.", error);
@@ -72,17 +74,20 @@ async function animarEntradaPerfil() {
   try {
     const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
     animate(hero, {
-      y: [12, 0],
-      duration: 430,
-      ease: "out(3)"
+      opacity: [0.4, 1],
+      y: [42, 0],
+      scale: [0.95, 1],
+      duration: 1000,
+      ease: "out(4)"
     });
 
     barras.forEach(barra => { barra.style.transformOrigin = "left center"; });
     animate(barras, {
-      scaleX: [0.82, 1],
-      duration: 480,
-      delay: stagger(45),
-      ease: "out(3)"
+      opacity: [0.4, 1],
+      scaleX: [0, 1],
+      duration: 850,
+      delay: stagger(85),
+      ease: "out(4)"
     });
   } catch (error) {
     console.warn("Anime.js não carregou; mantendo o perfil estático.", error);

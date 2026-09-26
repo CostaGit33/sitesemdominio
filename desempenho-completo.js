@@ -206,10 +206,12 @@ async function animarEstatisticasIniciais() {
       if (!celulas.length) return;
 
       animate(celulas, {
-        y: [7, 0],
-        duration: 320,
-        delay: stagger(16, { start: index * 18 }),
-        ease: "out(3)"
+        opacity: [0, 1],
+        y: [18, 0],
+        scale: [0.92, 1],
+        duration: 720,
+        delay: stagger(44, { start: index * 20 }),
+        ease: "out(4)"
       });
     });
   } catch (error) {
