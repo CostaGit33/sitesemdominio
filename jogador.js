@@ -5,6 +5,7 @@ const profileEl = document.getElementById("playerProfile");
 const params = new URLSearchParams(window.location.search);
 const selectedId = ["id", "jogador_id", "player_id", "jogador"].map(key => params.get(key)).find(value => value !== null && value.trim() !== "") || null;
 const fields = [["pontos", "Pontos"], ["gols", "Gols"], ["defesa", "Defesas"], ["vitorias", "Vitórias"], ["empate", "Empates"], ["infracoes", "Infrações"]];
+let listaAnimada = false;
 
 function n(value) { const result = Number(value); return Number.isFinite(result) ? Math.max(0, result) : 0; }
 function text(value) { return value === undefined || value === null || String(value).trim() === "" ? "Não informado" : String(value); }
@@ -13,11 +14,22 @@ function image(player, className) { const size = className === "hero-photo" ? "m
 function technical(player, performance) { return performance.find(item => String(item.id) === String(player.id))?.avaliacao || {}; }
 
 function renderList(players) {
-  stateEl.hidden = true; profileEl.hidden = false;
+  stateEl.hidden = true;
+  profileEl.hidden = false;
   profileEl.innerHTML = `<section class="players-hero"><p class="eyebrow">FUTPONTOS / PLANTEL</p><h1>Perfis dos jogadores</h1><p>Escolha um jogador para consultar seus dados e avaliações.</p><div class="list-tabs"><button class="active" data-key="pontos">Ranking geral</button><button data-key="gols">Marcadores</button><button data-key="defesa">Defesas</button><button data-key="vitorias">Vitórias</button></div></section><section class="players-list" id="playersList"></section>`;
   const list = document.getElementById("playersList");
-  const draw = key => { const ordered = [...players].sort((a, b) => n(b[key]) - n(a[key])); list.innerHTML = ordered.map((player, index) => `<a class="player-row" href="jogador.html?id=${encodeURIComponent(player.id)}"><span class="player-rank">${index + 1}</span>${image(player, "player-thumb")}<span class="player-copy"><strong>${esc(player.nome)}</strong><small>Jogador #${esc(player.id)} · ${n(player.pontos)} pontos</small></span><span class="player-score"><strong>${n(player[key])}</strong><small>${key === "pontos" ? "PONTOS" : key.toUpperCase()}</small></span><span class="row-arrow">›</span></a>`).join("") || `<div class="empty-state">Nenhum jogador cadastrado.</div>`; document.querySelectorAll(".list-tabs button").forEach(button => button.classList.toggle("active", button.dataset.key === key)); };
-  document.querySelectorAll(".list-tabs button").forEach(button => button.addEventListener("click", () => draw(button.dataset.key))); draw("pontos");
+  const draw = key => {
+    const ordered = [...players].sort((a, b) => n(b[key]) - n(a[key]));
+    list.innerHTML = ordered.map((player, index) => `<a class="player-row" href="jogador.html?id=${encodeURIComponent(player.id)}"><span class="player-rank">${index + 1}</span>${image(player, "player-thumb")}<span class="player-copy"><strong>${esc(player.nome)}</strong><small>Jogador #${esc(player.id)} · ${n(player.pontos)} pontos</small></span><span class="player-score"><strong>${n(player[key])}</strong><small>${key === "pontos" ? "PONTOS" : key.toUpperCase()}</small></span><span class="row-arrow">›</span></a>`).join("") || `<div class="empty-state">Nenhum jogador cadastrado.</div>`;
+    document.querySelectorAll(".list-tabs button").forEach(button => button.classList.toggle("active", button.dataset.key === key));
+  };
+  document.querySelectorAll(".list-tabs button").forEach(button => button.addEventListener("click", () => draw(button.dataset.key)));
+  draw("pontos");
+
+  if (!listaAnimada) {
+    listaAnimada = true;
+    animarEntradaLista();
+  }
 }
 
 function renderProfile(player, performance) {
@@ -30,6 +42,51 @@ function renderProfile(player, performance) {
   profileEl.innerHTML = `<section class="reference-hero"><a class="hero-back" href="jogador.html" aria-label="Voltar">‹</a><div class="hero-watermark">FP</div><div class="hero-player">${image(player, "hero-photo")}<h1>${esc(player.nome)}</h1><div class="hero-meta"><span>${esc(text(player.pais || player.país))}</span><span>${esc(text(player.clube || player.time))}</span></div><div class="hero-actions"><button id="comparePlayer" class="compare-button">Comparar</button><button id="sharePlayer" class="share-button" aria-label="Compartilhar">⌯</button></div></div></section><nav class="profile-tabs reference-tabs" aria-label="Seções do jogador"><a class="active" href="#geral">Visão geral</a><a href="#estatisticas">Estatísticas</a><a href="#jogos">Jogos</a><a href="#noticias">Notícias</a></nav><section class="reference-content" id="geral"><div class="info-grid"><div><span>POSIÇÃO</span><strong>${esc(text(player.posicao || player.posição))}</strong></div><div><span>NÚMERO NA SELEÇÃO</span><strong>${esc(text(player.numeroSelecao || player.numero_selecao))}</strong></div><div><span>NÚMERO DO CLUBE</span><strong>${esc(text(player.numeroClube || player.numero_clube))}</strong></div><div><span>PAÍS</span><strong>${esc(text(player.pais || player.país))}</strong></div><div><span>DATA DE NASCIMENTO</span><strong>${esc(text(player.dataNascimento || player.data_nascimento))}</strong></div></div><div class="reference-divider"></div><div class="section-heading"><h2>Resumo da temporada</h2><a href="#estatisticas">Ver tudo</a></div><div class="summary-cards">${stats.map(item => `<article><strong>${item.value}</strong><span>${item.label}</span></article>`).join("")}</div></section><section class="reference-content" id="estatisticas"><div class="section-heading"><h2>Estatísticas</h2><span class="points-label">${points} pontos</span></div><div class="metric-list">${stats.map(item => `<div class="reference-metric"><div><span>${item.label}</span><strong>${item.value}</strong></div><div class="reference-track"><i style="width:${Math.round((item.value / max) * 100)}%"></i></div></div>`).join("")}</div>${techFields.length ? `<h2 class="subheading">Avaliação técnica</h2>${techFields.map(([key, label]) => `<div class="reference-metric"><div><span>${label}</span><strong>${n(tech[key])}</strong></div><div class="reference-track"><i style="width:${Math.min(100, n(tech[key]) * 5)}%"></i></div></div>`).join("")}` : ""}</section><section class="reference-content unavailable" id="jogos"><h2>Jogos</h2><p>Não há dados de jogos disponíveis na API para este jogador.</p></section><section class="reference-content unavailable" id="noticias"><h2>Notícias</h2><p>Não há notícias disponíveis na API para este jogador.</p></section>`;
   document.getElementById("comparePlayer")?.addEventListener("click", () => { window.location.href = "jogador.html"; });
   document.getElementById("sharePlayer")?.addEventListener("click", async event => { try { await navigator.clipboard.writeText(location.href); event.currentTarget.textContent = "✓"; } catch { showFeedback("Copie o endereço do navegador para compartilhar.", "error"); } });
+  animarEntradaPerfil();
+}
+
+async function animarEntradaLista() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const elementos = document.querySelectorAll(".players-hero h1, #playersList .player-row");
+  if (!elementos.length) return;
+
+  try {
+    const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
+    animate(elementos, {
+      y: [8, 0],
+      duration: 340,
+      delay: stagger(28),
+      ease: "out(3)"
+    });
+  } catch (error) {
+    console.warn("Anime.js não carregou; mantendo a lista estática.", error);
+  }
+}
+
+async function animarEntradaPerfil() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const hero = profileEl.querySelector(".hero-player");
+  const barras = [...profileEl.querySelectorAll(".reference-track i")];
+  if (!hero) return;
+
+  try {
+    const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
+    animate(hero, {
+      y: [12, 0],
+      duration: 430,
+      ease: "out(3)"
+    });
+
+    barras.forEach(barra => { barra.style.transformOrigin = "left center"; });
+    animate(barras, {
+      scaleX: [0.82, 1],
+      duration: 480,
+      delay: stagger(45),
+      ease: "out(3)"
+    });
+  } catch (error) {
+    console.warn("Anime.js não carregou; mantendo o perfil estático.", error);
+  }
 }
 
 async function load() { try { const [players, performance] = await Promise.all([apiRequest("/jogadores"), apiRequest("/desempenho").catch(() => [])]); const normalizedId = selectedId ? decodeURIComponent(selectedId).trim().replace(/^#/, "") : null; const player = normalizedId ? players.find(item => String(item.id) === normalizedId) : null; if (normalizedId && !player) { renderList(players); const notice = document.createElement("p"); notice.className = "profile-notice"; notice.textContent = `Jogador ${normalizedId} não encontrado. Selecione um jogador abaixo.`; profileEl.prepend(notice); return; } player ? renderProfile(player, performance) : renderList(players); } catch (error) { stateEl.textContent = error.message || "Erro ao carregar dados."; stateEl.className = "player-error"; } }

@@ -5,6 +5,7 @@ const container = document.getElementById("completeContainer");
 const status = document.getElementById("completeStatus");
 const search = document.getElementById("searchPlayer");
 let jogadores = [];
+let estatisticasAnimadas = false;
 
 function normalizarNome(nome = "") {
   return String(nome)
@@ -186,6 +187,34 @@ function renderizar(lista) {
       }
     }
   });
+
+  if (!estatisticasAnimadas) {
+    estatisticasAnimadas = true;
+    animarEstatisticasIniciais();
+  }
+}
+
+async function animarEstatisticasIniciais() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const cartoes = [...container.querySelectorAll(".complete-card")];
+  if (!cartoes.length) return;
+
+  try {
+    const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
+    cartoes.forEach((cartao, index) => {
+      const celulas = cartao.querySelectorAll(".api-grid .stat, .tech-grid .stat");
+      if (!celulas.length) return;
+
+      animate(celulas, {
+        y: [7, 0],
+        duration: 320,
+        delay: stagger(16, { start: index * 18 }),
+        ease: "out(3)"
+      });
+    });
+  } catch (error) {
+    console.warn("Anime.js não carregou; mantendo as estatísticas estáticas.", error);
+  }
 }
 
 async function carregar() {
