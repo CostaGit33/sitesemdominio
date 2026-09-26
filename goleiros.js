@@ -110,8 +110,6 @@ function renderCards(lista, container) {
 
     const card = document.createElement("div");
     card.className = "player-card";
-    card.style.animation = "fadeUp .4s ease both";
-    card.style.animationDelay = `${i * 0.05}s`;
     card.style.display = "flex";
     card.style.flexDirection = "column";
     card.style.alignItems = "center";
@@ -139,7 +137,7 @@ function renderCards(lista, container) {
       </div>
 
       <div class="progress-bar" style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 10px 0; overflow: hidden;">
-        <div class="progress-fill" style="height: 100%; background: #00ff88; width: 0; transition: width 1s ease-out;"></div>
+        <div class="progress-fill" data-target-width="${percentual}%" style="height: 100%; background: #00ff88; width: 0;"></div>
       </div>
 
       <div class="player-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; font-size: 0.8rem; opacity: 0.8;">
@@ -168,9 +166,62 @@ function renderCards(lista, container) {
       options: radarOptions
     });
 
-    requestAnimationFrame(() => {
-      const bar = card.querySelector(".progress-fill");
-      if (bar) bar.style.width = `${percentual}%`;
-    });
   });
+
+  animarEntradaGoleiros(container);
+}
+
+async function animarEntradaGoleiros(container) {
+  const barras = [...container.querySelectorAll(".progress-fill")];
+  const exibirBarras = () => {
+    barras.forEach(barra => {
+      barra.style.width = barra.dataset.targetWidth || "0%";
+    });
+  };
+
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    exibirBarras();
+    return;
+  }
+
+  try {
+    const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
+
+    animate(".section-header", {
+      opacity: [0, 1],
+      y: [10, 0],
+      duration: 420,
+      delay: stagger(90),
+      ease: "out(3)"
+    });
+
+    animate("#tabela-goleiros tr", {
+      opacity: [0, 1],
+      y: [8, 0],
+      duration: 380,
+      delay: stagger(35),
+      ease: "out(3)"
+    });
+
+    animate(container.querySelectorAll(".player-card"), {
+      opacity: [0, 1],
+      y: [18, 0],
+      scale: [0.97, 1],
+      duration: 520,
+      delay: stagger(55),
+      ease: "out(3)"
+    });
+
+    barras.forEach((barra, index) => {
+      animate(barra, {
+        width: barra.dataset.targetWidth || "0%",
+        duration: 850,
+        delay: 160 + Math.min(index, 12) * 35,
+        ease: "out(4)"
+      });
+    });
+  } catch (error) {
+    console.warn("Anime.js não carregou; exibindo os dados sem animação.", error);
+    exibirBarras();
+  }
 }
