@@ -236,9 +236,11 @@ async function animarCabecalhoClassificacao() {
   try {
     const { animate } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
     animate(cabecalho, {
-      y: [8, 0],
-      duration: 360,
-      ease: "out(3)"
+      opacity: [0.35, 1],
+      y: [28, 0],
+      scale: [0.92, 1],
+      duration: 900,
+      ease: "out(4)"
     });
   } catch (error) {
     console.warn("Anime.js não carregou; mantendo a classificação estática.", error);
