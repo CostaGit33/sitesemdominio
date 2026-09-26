@@ -1,6 +1,8 @@
 ﻿import { apiRequest, calculatePoints } from "./globais.js";
 import { desempenhoJogadores } from "./desempenho_data.js";
 
+let classificacaoAnimada = false;
+
 /* ======================================================
    CONFIGURAÇÃO
 ====================================================== */
@@ -74,6 +76,11 @@ async function carregarClassificacao() {
 
     if (tbody) renderTable(jogadores, tbody);
     if (cardsContainer) renderCards(jogadores, cardsContainer);
+
+    if (tbody && !classificacaoAnimada) {
+      classificacaoAnimada = true;
+      animarCabecalhoClassificacao();
+    }
 
   } catch (error) {
     console.error("Erro ao carregar classificação:", error);
@@ -220,3 +227,20 @@ function renderCards(jogadores, container) {
   });
 }
 
+async function animarCabecalhoClassificacao() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+  const cabecalho = document.querySelector(".classification-section .section-header");
+  if (!cabecalho) return;
+
+  try {
+    const { animate } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
+    animate(cabecalho, {
+      y: [8, 0],
+      duration: 360,
+      ease: "out(3)"
+    });
+  } catch (error) {
+    console.warn("Anime.js não carregou; mantendo a classificação estática.", error);
+  }
+}
