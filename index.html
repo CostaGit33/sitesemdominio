@@ -3,27 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FutPontos | Perfis dos Jogadores</title>
+  <meta name="theme-color" content="#0b0b0d" />
+  <meta name="description" content="FutPontos — acompanhe classificação, perfis e desempenho dos jogadores." />
+  <title>FutPontos | Início</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#b30e1d" />
   <link rel="icon" href="futponts_large.png" type="image/png" />
   <link rel="apple-touch-icon" href="futponts_large.png" />
-  <link rel="stylesheet" href="common-nav.css" />
-  <link rel="stylesheet" href="jogador.css?v=59" />
+  <link rel="stylesheet" href="common-nav.css?v=60" />
+  <link rel="stylesheet" href="home.css?v=1" />
 </head>
 <body>
-  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo"><div class="install-banner-text"><strong>Instale o FutPontos no seu celular</strong><p>Acesso rápido, tela cheia, funciona offline.</p></div><div class="install-banner-actions"><button class="install-btn primary" id="install-confirm">Instalar</button><button class="install-btn" id="install-dismiss">Agora não</button></div></div>
-  <header class="app-header profile-topbar">
-    <div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos Logo" /></div>
-    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
-    <nav class="app-nav" aria-label="Navegação principal"><ul><li><a href="classificacao.html">Classificação</a></li><li><a href="jogador.html">Perfis</a></li><li><a href="goleiros.html">Goleiros</a></li><li><a href="desempenho.html">Desempenho</a></li></ul></nav>
+  <div class="install-banner" id="install-banner" aria-label="Instalar aplicativo">
+    <div class="install-banner-text"><strong>Tenha o FutPontos sempre à mão</strong><p>Adicione o aplicativo à tela inicial do celular.</p></div>
+    <div class="install-banner-actions"><button class="install-btn primary" id="install-confirm">Instalar</button><button class="install-btn" id="install-dismiss">Agora não</button></div>
+  </div>
+  <header class="app-header">
+    <a class="brand" href="index.html" aria-label="FutPontos — início"><img src="futponts_large.png" class="brand-logo" alt="FutPontos" /></a>
+    <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="index.html" aria-current="page">Início</a></li>
+        <li><a href="classificacao.html">Classificação</a></li>
+        <li><a href="jogador.html">Perfis</a></li>
+        <li><a href="goleiros.html">Goleiros</a></li>
+        <li><a href="desempenho-completo.html">Desempenho</a></li>
+      </ul>
+    </nav>
   </header>
-  <main class="player-page">
-    <div id="playerState" class="player-loading">Carregando jogadores...</div>
-    <section id="playerProfile" hidden></section>
+  <main class="home-page">
+    <section class="home-hero" aria-labelledby="home-title">
+      <span class="home-kicker">Central do jogador</span>
+      <h1 id="home-title">Seu futebol.<br /><span>Seus números.</span></h1>
+      <p>Consulte a classificação, explore os perfis e acompanhe o desempenho dos jogadores em um só lugar.</p>
+    </section>
+    <div class="home-section-heading">
+      <h2>O que você quer acompanhar?</h2>
+      <p>Acesso direto às áreas principais</p>
+    </div>
+    <section class="home-tools" aria-label="Áreas do FutPontos">
+      <a class="home-tool" href="classificacao.html">
+        <span class="home-tool-icon" aria-hidden="true">↗</span><span><h3>Classificação</h3><p>Veja a pontuação e a posição dos jogadores.</p></span><span class="home-tool-arrow" aria-hidden="true">›</span>
+      </a>
+      <a class="home-tool" href="jogador.html">
+        <span class="home-tool-icon" aria-hidden="true">◎</span><span><h3>Perfis dos jogadores</h3><p>Consulte os dados e o histórico individual.</p></span><span class="home-tool-arrow" aria-hidden="true">›</span>
+      </a>
+      <a class="home-tool" href="goleiros.html">
+        <span class="home-tool-icon" aria-hidden="true">▣</span><span><h3>Goleiros</h3><p>Acompanhe os indicadores específicos dos goleiros.</p></span><span class="home-tool-arrow" aria-hidden="true">›</span>
+      </a>
+      <a class="home-tool" href="desempenho-completo.html">
+        <span class="home-tool-icon" aria-hidden="true">⌁</span><span><h3>Desempenho completo</h3><p>Explore as métricas e os indicadores de rendimento.</p></span><span class="home-tool-arrow" aria-hidden="true">›</span>
+      </a>
+    </section>
+    <p class="home-note">Os números e as classificações são apresentados nas respectivas áreas do aplicativo, usando os dados disponíveis no FutPontos.</p>
   </main>
-  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos • semdominio.online</span></div></footer>
-  <div id="feedback" aria-live="polite"></div>
-  <script type="module" src="./globais.js?v=57"></script><script src="menu.js?v=59"></script><script type="module" src="./jogador.js?v=59"></script>
+  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer>
+  <script type="module" src="./globais.js?v=60"></script>
+  <script src="menu.js?v=60"></script>
 </body>
 </html>
