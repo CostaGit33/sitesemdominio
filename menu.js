@@ -16,20 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // O item Montar Times é injetado centralmente para que todas as páginas
-  // que usam o menu compartilhem exatamente a mesma navegação.
+  // Mantém o menu centralizado sem injetar atalhos para áreas desativadas.
   if (appNav) {
     const ul = appNav.querySelector("ul");
     if (ul) {
-      if (!ul.querySelector('a[href="montar-times.html"]')) {
-        const li = document.createElement("li");
-        li.innerHTML = '<a href="montar-times.html">Montar Times</a>';
-        const desempenho = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "desempenho-completo.html");
-        const videos = [...ul.querySelectorAll("a")].find(a => a.getAttribute("href") === "videos.html");
-        if (desempenho?.parentElement) desempenho.parentElement.after(li);
-        else if (videos?.parentElement) ul.insertBefore(li, videos.parentElement);
-        else ul.appendChild(li);
-      }
+      ul.querySelectorAll('a[href="videos.html"], a[href="topo.html"], a[href="analise-semana.html"], a[href="montar-times.html"]').forEach(link => link.closest("li")?.remove());
 
       if (!ul.querySelector('a[href="jogador.html"]')) {
         const li = document.createElement("li");
@@ -41,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       ul.querySelectorAll("a").forEach(link => {
         const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
-        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "jogador.html") || (currentPage === "classificacao.html" && href === "classificacao.html");
+        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "jogador.html");
         link.classList.toggle("active", isCurrent);
         if (isCurrent) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
