@@ -294,17 +294,17 @@ td strong {
 
   /* células compactas */
   th, td {
-    padding: 0.38rem 0.15rem;
-    font-size: 0.71rem;
+    padding: 0.22rem 0.12rem;
+    font-size: 0.62rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   th {
-    font-size: 0.60rem;
-    letter-spacing: 0.2px;
-    padding: 0.42rem 0.15rem;
+    font-size: 0.53rem;
+    letter-spacing: 0;
+    padding: 0.25rem 0.1rem;
   }
 
   /* --- LARGURAS EXPLÍCITAS DAS 8 COLUNAS --- */
@@ -352,8 +352,8 @@ td strong {
   }
 
   th, td {
-    font-size: 0.62rem;
-    padding: 0.32rem 0.1rem;
+    font-size: 0.56rem;
+    padding: 0.18rem 0.08rem;
   }
 
   th:nth-child(2), td:nth-child(2) {
