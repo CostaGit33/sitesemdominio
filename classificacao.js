@@ -118,8 +118,6 @@ function renderTable(jogadores, tbody) {
   jogadores.forEach((j, index) => {
     const tr = document.createElement("tr");
 
-    tr.style.animation = "fadeUp .4s ease both";
-    tr.style.animationDelay = `${index * 0.03}s`;
 
     tr.innerHTML = `
       <td>${index + 1}</td>
