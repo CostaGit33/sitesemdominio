@@ -1,4 +1,4 @@
-const CACHE_NAME = "futpontos-v59";
+const CACHE_NAME = "futpontos-v60";
 
 const STATIC_ASSETS = [
   "/futponts_large.png",
@@ -27,8 +27,7 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // HTML, JS e CSS devem sempre vir da rede para impedir que uma versão
-  // antiga do projeto reapareça depois de um reload/atualização.
+  // HTML, JS e CSS são atualizados pela rede para evitar servir interfaces antigas.
   const liveFile = request.mode === "navigate" ||
     request.headers.get("accept")?.includes("text/html") ||
     /\.(html|js|css)$/i.test(url.pathname);
