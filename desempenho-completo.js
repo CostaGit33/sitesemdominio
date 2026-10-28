@@ -160,9 +160,9 @@ function renderizar(lista) {
             datasets: [{
               data: stats,
               borderWidth: 2,
-              borderColor: "#00ff88",
-              backgroundColor: "rgba(0,255,136,.18)",
-              pointBackgroundColor: "#00ff88",
+              borderColor: "#ef3434",
+              backgroundColor: "rgba(214, 40, 40, .18)",
+              pointBackgroundColor: "#ef3434",
               pointRadius: 3,
               pointHoverRadius: 5
             }]

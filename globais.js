@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".app-nav a").forEach(link => {
     const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
-    link.classList.toggle("active", href === currentPage || (currentPage === "index.html" && href === "jogador.html"));
+    link.classList.toggle("active", href === currentPage);
   });
 
   const footerContent = document.querySelector(".footer-content span");

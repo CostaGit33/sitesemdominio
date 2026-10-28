@@ -1,339 +1,172 @@
-﻿/* ============================
-   Common Navigation & Global Styles
-   Baseado no padrão FutPontos
-============================ */
-
+/* FutPontos — sistema visual compartilhado
+   Evolução UX inspirada na clareza e hierarquia do Mais1km.
+   Preserva a identidade original: preto, vermelho e branco. */
 :root {
-  --primary-color: #D62828;
-  --primary-gradient: linear-gradient(to right, #000000, #D62828);
-  --secondary-bg: #0f0f0f;
-  --accent-color: #ffffff;
-  --text-color: #ffffff;
-  --hover-color: #D62828;
+  color-scheme: dark;
+  --fp-red: #d62828;
+  --fp-red-strong: #ef3434;
+  --fp-red-soft: rgba(214, 40, 40, .14);
+  --fp-bg: #0b0b0d;
+  --fp-bg-raised: #121214;
+  --fp-surface: #18181b;
+  --fp-surface-raised: #202024;
+  --fp-text: #f7f7f8;
+  --fp-muted: #a7a7ad;
+  --fp-border: rgba(255,255,255,.10);
+  --fp-focus: #ffcc00;
+  --fp-success: #57c785;
+  --fp-radius: 16px;
+  --fp-radius-sm: 10px;
+  --fp-shadow: 0 12px 32px rgba(0,0,0,.22);
+  --primary-color: var(--fp-red);
+  --primary-gradient: linear-gradient(115deg, #151515, #b30e1d);
+  --secondary-bg: var(--fp-bg);
+  --accent-color: #fff;
+  --text-color: var(--fp-text);
+  --hover-color: var(--fp-red-strong);
   --highlight-color: #ffcc00;
-  --app-gradient: linear-gradient(135deg, #0041A8, #000000, #D62828);
-  --font-family: "Oswald", sans-serif;
-  --border-color: #2e2e2e;
-  --surface-color: #1c1c1c;
+  --app-gradient: linear-gradient(135deg, #090909, #191919 58%, #3b0b10);
+  --font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --border-color: var(--fp-border);
+  --surface-color: var(--fp-surface);
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 320px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
-  font-family: var(--font-family);
-  background: var(--secondary-bg);
-  color: var(--text-color);
-  line-height: 1.4;
+  margin: 0;
   min-height: 100vh;
-  background-attachment: fixed;
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+body::before { content: none !important; }
+img { max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea, [role="button"] { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; }
+button { touch-action: manipulation; }
+:where(a, button, input, select, textarea, [role="button"]):focus-visible {
+  outline: 3px solid var(--fp-focus);
+  outline-offset: 3px;
+}
+::selection { color: #fff; background: #a91620; }
 
-/* Header & Nav */
+/* Cabeçalho e navegação */
 .app-header {
-  background: var(--primary-gradient);
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   position: sticky;
   top: 0;
   z-index: 1000;
-}
-
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  z-index: 1001;
-  touch-action: manipulation;
-}
-
-.menu-toggle:active {
-  opacity: 0.7;
-}
-
-.brand {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: auto;
-}
-
-.brand-logo {
-  height: 40px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-.brand h1 {
-  font-size: 1.5rem;
-  color: var(--highlight-color);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.app-nav {
-  display: flex;
-}
-
-.app-nav ul {
-  display: flex;
-  list-style: none;
-  gap: 1.5rem;
-}
-
-.app-nav a {
-  color: var(--accent-color);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: color 0.3s, opacity 0.3s;
-  opacity: 0.8;
-}
-
-.app-nav a:hover, .app-nav a.active {
-  opacity: 1;
-  color: var(--highlight-color);
-}
-
-/* BANNER INSTALL PWA */
-.install-banner {
-  display: none;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  animation: fadeUp 0.3s ease;
-  flex-wrap: wrap;
-  background: rgba(20, 20, 20, 0.95);
+  gap: 1.25rem;
+  min-height: 68px;
+  padding: .75rem clamp(1rem, 4vw, 2.25rem);
+  background: rgba(12,12,14,.94);
+  border-bottom: 1px solid var(--fp-border);
+  box-shadow: 0 6px 24px rgba(0,0,0,.18);
+  backdrop-filter: blur(16px);
 }
-
-.install-banner.visible {
-  display: flex;
+.brand { display:flex; align-items:center; justify-content:center; min-width:0; }
+.brand-logo { display:block; width:auto; height:38px; max-width:min(44vw, 190px); object-fit:contain; }
+.brand h1 { margin:0; color:var(--fp-text); font-size:1.1rem; font-weight:800; letter-spacing:.04em; }
+.app-nav { display:flex; align-items:center; }
+.app-nav ul { display:flex; align-items:center; flex-wrap:wrap; gap:.35rem; margin:0; padding:0; list-style:none; }
+.app-nav a {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:40px; padding:.55rem .85rem; border:1px solid transparent; border-radius:10px;
+  color:#d0d0d4; text-decoration:none; font-size:.88rem; font-weight:650;
+  transition: color .16s ease, background .16s ease, border-color .16s ease;
 }
-
-.install-banner-text strong {
-  display: block;
-  font-size: 0.88rem;
-  font-weight: 700;
+.app-nav a:hover { color:#fff; background:rgba(255,255,255,.06); }
+.app-nav a.active, .app-nav a[aria-current="page"] {
+  color:#fff; background:var(--fp-red-soft); border-color:rgba(214,40,40,.35);
 }
-
-.install-banner-text p {
-  margin: 0.15rem 0 0;
-  font-size: 0.72rem;
-  opacity: 0.5;
+.menu-toggle {
+  display:none; align-items:center; justify-content:center; width:44px; height:44px;
+  padding:0; border:1px solid var(--fp-border); border-radius:12px;
+  color:#fff; background:var(--fp-surface); font-size:1.4rem; cursor:pointer;
 }
+.menu-toggle:hover { background:var(--fp-surface-raised); }
 
-.install-banner-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Superfícies reutilizáveis: compatíveis com as classes existentes */
+:where(.card, .player-card, .stat-card, .stat-box, .performance-card, .ranking-card, .goalkeeper-card, .week-card, .profile-card, .panel, .section-card) {
+  border:1px solid var(--fp-border);
+  border-radius:var(--fp-radius);
+  background:linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012)), var(--fp-surface);
+  box-shadow:var(--fp-shadow);
 }
-
-.install-btn {
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
+:where(h1, h2, h3, h4) { line-height:1.18; text-wrap:balance; }
+:where(p, .muted, .subtitle, .description) { overflow-wrap:anywhere; }
+:where(.muted, .subtitle, .description, small) { color:var(--fp-muted); }
+:where(input, select, textarea) {
+  max-width:100%; min-height:44px; padding:.7rem .85rem;
+  color:var(--fp-text); background:#111113; border:1px solid #38383e; border-radius:var(--fp-radius-sm);
 }
-
-.install-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
+:where(input, select, textarea)::placeholder { color:#85858c; }
+:where(button, .button, .btn, [role="button"]) {
+  min-height:42px; border-radius:11px; transition:background .16s ease, border-color .16s ease, transform .16s ease;
 }
-
-.install-btn.primary {
-  background: #4caf50;
-  color: #000;
-  border-color: transparent;
+button {
+  padding:.65rem 1rem; color:#fff; border:1px solid rgba(255,255,255,.08);
+  background:var(--fp-red); font-weight:700; cursor:pointer; box-shadow:none; animation:none;
 }
-
-.install-btn.primary:hover {
-  opacity: 0.85;
+button:hover { background:var(--fp-red-strong); transform:translateY(-1px); box-shadow:none; }
+button:active { transform:translateY(0); }
+button:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+:where(.install-btn, .secondary-button, .button-secondary, .btn-secondary) {
+  color:var(--fp-text); background:var(--fp-surface); border:1px solid var(--fp-border);
 }
+:where(.install-btn, .secondary-button, .button-secondary, .btn-secondary):hover { background:var(--fp-surface-raised); }
+:where(.primary-button, .btn-primary) { color:#fff; background:var(--fp-red); }
+:where(table) { width:100%; border-collapse:collapse; }
+:where(th, td) { padding:.7rem .8rem; border-bottom:1px solid var(--fp-border); text-align:left; }
+:where(th) { color:#d8d8dc; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
 
-/* ANIMAÇÃO FADE UP */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Banner de instalação PWA e mensagens */
+.install-banner {
+  display:none; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  padding:.75rem clamp(1rem,4vw,2rem); background:#151517; border-bottom:1px solid var(--fp-border);
 }
+.install-banner.visible { display:flex; }
+.install-banner-text strong { display:block; font-size:.9rem; }
+.install-banner-text p { margin:.2rem 0 0; color:var(--fp-muted); font-size:.8rem; }
+.install-banner-actions { display:flex; align-items:center; gap:.5rem; }
+.install-btn { min-height:38px; padding:.45rem .8rem; border-radius:9px; font-size:.82rem; }
+.install-btn.primary { color:#fff; background:var(--fp-red); border-color:transparent; }
+.feedback { position:fixed; right:16px; bottom:16px; z-index:2000; max-width:min(92vw,420px); padding:12px 16px; border:1px solid var(--fp-border); border-radius:12px; color:#fff; background:#242428; box-shadow:var(--fp-shadow); }
+.feedback.success { background:#153b27; }
+.feedback.error { background:#511b20; }
+.app-footer { padding:1.5rem 1rem; color:var(--fp-muted); text-align:center; font-size:.78rem; }
+.app-footer p { margin:.25rem 0; }
 
-/* Feedback UI */
-.feedback {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 12px 24px;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  z-index: 2000;
-  animation: slideInRight 0.3s ease-out;
+/* Acessibilidade e movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
-
-.feedback.success {
-  background-color: #2ecc71;
-}
-
-.feedback.error {
-  background-color: #e74c3c;
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Footer */
-.app-footer {
-  text-align: center;
-  padding: 2rem;
-  opacity: 0.6;
-  font-size: 0.8rem;
-}
-
-/* RESPONSIVE TABLET (768px) */
-@media (max-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-
-  .app-header {
-    padding: 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .brand-logo {
-    height: 35px;
-  }
-
-  .menu-toggle {
-    display: block;
-    order: 3;
-    margin-left: auto;
-  }
-
+@media (max-width: 800px) {
+  .app-header { min-height:60px; padding:.65rem .9rem; gap:.5rem; }
+  .brand-logo { height:33px; }
+  .menu-toggle { display:inline-flex; margin-left:auto; }
   .app-nav {
-    display: none;
-    order: 4;
-    position: absolute;
-    top: calc(100% + 1px);
-    left: 0;
-    width: 100%;
-    background: #000;
-    padding: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    flex-direction: column;
+    display:none; position:absolute; top:calc(100% + 1px); left:0; right:0; z-index:1001;
+    padding:.7rem; background:rgba(13,13,15,.98); border-bottom:1px solid var(--fp-border);
+    box-shadow:0 14px 24px rgba(0,0,0,.28); backdrop-filter:blur(16px);
   }
-
-  .app-nav.active {
-    display: flex;
-  }
-
-  .app-nav ul {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-    width: 100%;
-  }
-
-  .app-nav a {
-    display: block;
-    padding: 0.5rem 1rem;
-    text-align: center;
-    font-size: 0.95rem;
-  }
-
-  .install-banner {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-    padding: 0.65rem 1rem;
-  }
-
-  .install-banner-actions {
-    justify-content: center;
-    gap: 0.4rem;
-  }
-
-  .install-btn {
-    flex: 1;
-    min-width: 100px;
-  }
+  .app-nav.active { display:block; }
+  .app-nav ul { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.4rem; }
+  .app-nav a { width:100%; min-height:44px; padding:.6rem .5rem; font-size:.86rem; text-align:center; }
+  .install-banner { align-items:stretch; }
+  .install-banner-actions { width:100%; }
+  .install-btn { flex:1; }
 }
-
-/* RESPONSIVE MOBILE (480px) */
-@media (max-width: 480px) {
-  html {
-    font-size: 12px;
-  }
-
-  .app-header {
-    padding: 0.75rem;
-  }
-
-  .brand-logo {
-    height: 30px;
-  }
-
-  .menu-toggle {
-    font-size: 1.3rem;
-    padding: 0.3rem;
-  }
-
-  .app-nav {
-    top: 100%;
-  }
-
-  .app-nav a {
-    font-size: 0.9rem;
-  }
-
-  .install-banner {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .install-banner-text strong {
-    font-size: 0.8rem;
-  }
-
-  .install-banner-text p {
-    font-size: 0.65rem;
-  }
-
-  .install-btn {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.7rem;
-  }
+@media (max-width: 420px) {
+  body { font-size:15px; }
+  .brand-logo { height:30px; }
+  .app-nav ul { grid-template-columns:1fr; }
+  :where(th, td) { padding:.55rem .45rem; }
 }
-
-
