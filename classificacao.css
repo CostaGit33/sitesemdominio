@@ -264,22 +264,23 @@ td strong {
 @media (max-width: 480px) {
 
   .app-main {
-    padding: 0.5rem 0.25rem;
-    gap: 1rem;
+    padding: 0.15rem 0.2rem 0.5rem;
+    gap: 0.35rem;
   }
 
   .section-header {
-    padding: 1rem 0.5rem 0.75rem;
+    padding: 0.2rem 0.25rem 0.35rem;
   }
 
   .section-header h1,
   .section-header h2 {
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+    font-size: 1.12rem;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
   }
 
   .brand-logo {
-    width: 90px;
+    width: 58px;
   }
 
   .table-wrapper {
@@ -294,17 +295,19 @@ td strong {
 
   /* células compactas */
   th, td {
-    padding: 0.22rem 0.12rem;
-    font-size: 0.62rem;
+    padding: 0.12rem 0.08rem;
+    font-size: 0.59rem;
+    line-height: 1.05;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   th {
-    font-size: 0.53rem;
+    font-size: 0.49rem;
     letter-spacing: 0;
-    padding: 0.25rem 0.1rem;
+    padding: 0.14rem 0.06rem;
+    line-height: 1;
   }
 
   /* --- LARGURAS EXPLÍCITAS DAS 8 COLUNAS --- */
