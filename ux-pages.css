@@ -1,0 +1,61 @@
+/* Melhorias isoladas de UX para páginas do FutPontos — não carregar em classificacao.html. */
+:where(.player-page, .complete-section, .app-main, .reels-shell) {
+  min-width: 0;
+}
+:where(.player-page, .complete-section, .app-main) :where(h1, h2, h3, p, a, strong, td, th, label) {
+  overflow-wrap: anywhere;
+}
+:where(.player-page, .complete-section, .app-main) :where(button, a, input, select, textarea) {
+  touch-action: manipulation;
+}
+:where(.player-page, .complete-section, .app-main) :where(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid #ffcc00;
+  outline-offset: 3px;
+}
+.player-page { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+:where(.players-hero, .players-list, .hero-player, .reference-content, .complete-card, .winner-card, #cards-goleiros .player-card) {
+  min-width: 0;
+}
+:where(.reference-tabs, .list-tabs) {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+:where(.reference-content, .info-grid, .summary-cards, .hero-meta, .hero-actions) {
+  min-width: 0;
+}
+#completeContainer .complete-card { height: auto; }
+#completeContainer canvas { max-width: 100%; }
+#cards-goleiros .player-card { min-width: 0; overflow-wrap: anywhere; }
+.app-main :where(.table-wrapper, .table-container) { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.app-main table { max-width: 100%; }
+.reels-topbar { max-width: calc(100% - 2rem); }
+.reels-status { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+@media (max-width: 700px) {
+  .player-page { padding-bottom: 1.5rem; }
+  :where(.players-hero, .players-list) { margin-top: 1rem; }
+  :where(.players-hero, .reference-content) { padding: 1rem; }
+  :where(.info-grid, .summary-cards) { gap: .75rem; }
+  :where(.hero-actions) { display: flex; flex-wrap: wrap; gap: .65rem; }
+  :where(.hero-actions button, .hero-actions a) { min-height: 44px; }
+  #completeContainer.complete-grid { grid-template-columns: minmax(0, 1fr); gap: .85rem; }
+  #completeContainer .complete-card { padding: 1rem; border-radius: 14px; }
+  .app-main { padding-left: .75rem; padding-right: .75rem; }
+  .app-main .winners-grid { grid-template-columns: minmax(0, 1fr); }
+  .reels-topbar { top: max(70px, env(safe-area-inset-top)); }
+}
+@media (max-width: 380px) {
+  :where(.players-hero, .players-list) { margin-right: .5rem; margin-left: .5rem; }
+  :where(.hero-meta, .hero-actions) { gap: .5rem; }
+  #completeContainer .complete-card { padding: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(.player-page, .complete-section, .app-main, .reels-shell) *,
+  :where(.player-page, .complete-section, .app-main, .reels-shell) *::before,
+  :where(.player-page, .complete-section, .app-main, .reels-shell) *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
