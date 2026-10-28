@@ -124,7 +124,7 @@ function renderCards(lista, container) {
 
     card.innerHTML = `
       <div class="player-rank" style="position: absolute; top: 10px; left: 10px;">#${String(i + 1).padStart(2, "0")}</div>
-      <div class="media-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(0,255,136,0.2); color: #00ff88; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">${media.toFixed(1)}</div>
+      <div class="media-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(214, 40, 40, 0.2); color: #ef3434; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">${media.toFixed(1)}</div>
 
       <div class="player-name" style="margin-top: 10px; font-weight: bold; font-size: 1.1rem;">
         <a href="jogador.html?id=${g.id}" class="player-link">${g.nome}</a>
@@ -132,12 +132,12 @@ function renderCards(lista, container) {
 
       <canvas id="${canvasId}" style="max-width: 180px; margin: 15px 0;"></canvas>
 
-      <div class="player-points" style="font-size: 1.2rem; font-weight: bold; color: #00ff88;">
+      <div class="player-points" style="font-size: 1.2rem; font-weight: bold; color: #ef3434;">
         ${formatarPontos(g.pontos)} pts
       </div>
 
       <div class="progress-bar" style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 10px 0; overflow: hidden;">
-        <div class="progress-fill" data-target-width="${percentual}%" style="height: 100%; background: #00ff88; width: 0;"></div>
+        <div class="progress-fill" data-target-width="${percentual}%" style="height: 100%; background: #ef3434; width: 0;"></div>
       </div>
 
       <div class="player-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; font-size: 0.8rem; opacity: 0.8;">
@@ -157,8 +157,8 @@ function renderCards(lista, container) {
         labels: ["Def", "Atq", "Hab", "Vel", "Pas"],
         datasets: [{
           data: stats,
-          borderColor: "#00ff88",
-          backgroundColor: "rgba(0, 255, 136, 0.2)",
+          borderColor: "#ef3434",
+          backgroundColor: "rgba(214, 40, 40, 0.2)",
           borderWidth: 2,
           pointRadius: 0
         }]
