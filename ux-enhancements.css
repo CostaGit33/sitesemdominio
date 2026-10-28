@@ -1,0 +1,58 @@
+/* FutPontos UX: melhorias compartilhadas nas páginas não-classificação.
+   Mantém classificação.html e classificacao.css deliberadamente intocados. */
+:where(a, button, input, select, textarea, [role="button"]) {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(a, button, input, select, textarea, [role="button"]):focus-visible {
+  outline: 3px solid var(--fp-focus, #ffcc00);
+  outline-offset: 3px;
+}
+:where(button, .button, .btn, [role="button"]) {
+  touch-action: manipulation;
+}
+:where(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+:where(img, video, canvas, svg) {
+  max-width: 100%;
+}
+:where(.panel, .card, .player-card, .stat-card, .stat-box, .performance-card,
+       .ranking-card, .goalkeeper-card, .week-card, .profile-card, .top-card,
+       .home-tool, .summary-panel, .available-panel) {
+  min-width: 0;
+}
+:where(.player-name, .player-card h2, .player-card h3, .top-name, .home-tool h3) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  :where(.player-page, .builder, .home-page, .app-main) {
+    width: 100%;
+    max-width: 100%;
+  }
+  :where(.toolbar-main, .toolbar, .filter-row) {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  :where(.toolbar-main input, .toolbar-main select, .toolbar input, .toolbar select) {
+    flex: 1 1 140px;
+    width: 100%;
+  }
+  :where(.builder-grid, .teams, .summary-grid, .top-grid, .cards, .home-tools) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :where(.player-card, .top-card, .panel, .home-tool) {
+    overflow-wrap: anywhere;
+  }
+  :where(.player-card button, .top-card button, .toolbar button, .toolbar-main button) {
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
