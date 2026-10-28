@@ -18,6 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
       ul.querySelectorAll('a[href="videos.html"], a[href="topo.html"], a[href="analise-semana.html"], a[href="montar-times.html"]')
         .forEach(link => link.closest("li")?.remove());
 
+      if (!ul.querySelector('a[href="index.html"]')) {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "index.html";
+        link.textContent = "Início";
+        ul.prepend(Object.assign(li, {}));
+        li.append(link);
+      }
+
       if (!ul.querySelector('a[href="jogador.html"]')) {
         const li = document.createElement("li");
         const link = document.createElement("a");
@@ -31,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       ul.querySelectorAll("a").forEach(link => {
         const href = (link.getAttribute("href") || "").split("?")[0].split("#")[0];
-        const isCurrent = href === currentPage || (currentPage === "index.html" && href === "jogador.html");
+        const isCurrent = href === currentPage;
         link.classList.toggle("active", isCurrent);
         if (isCurrent) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
