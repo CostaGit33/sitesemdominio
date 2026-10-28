@@ -296,15 +296,15 @@ td strong {
   /* células compactas */
   th, td {
     padding: 0.12rem 0.08rem;
-    font-size: 0.59rem;
-    line-height: 1.05;
+    font-size: 0.55rem;
+    line-height: 1.02;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   th {
-    font-size: 0.49rem;
+    font-size: 0.45rem;
     letter-spacing: 0;
     padding: 0.14rem 0.06rem;
     line-height: 1;
@@ -355,8 +355,8 @@ td strong {
   }
 
   th, td {
-    font-size: 0.56rem;
-    padding: 0.18rem 0.08rem;
+    font-size: 0.52rem;
+    padding: 0.16rem 0.07rem;
   }
 
   th:nth-child(2), td:nth-child(2) {
