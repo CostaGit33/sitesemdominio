@@ -29,6 +29,15 @@ function getYearKey(date = new Date()) {
   return String(date.getFullYear());
 }
 
+function esc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function formatDelta(v) {
   const n = Number(v) || 0;
   return `${n >= 0 ? "+" : ""}${n}`;
@@ -141,7 +150,7 @@ function renderTimeline(events, selectedId) {
   tbody.innerHTML = rows.map(row => `
     <tr>
       <td>${new Date(row.at).toLocaleString("pt-BR")}</td>
-      <td>${row.weekKey}</td>
+      <td>${esc(row.weekKey)}</td>
       <td><strong>${formatDelta(row.delta)}</strong></td>
     </tr>
   `).join("");
@@ -188,7 +197,7 @@ function renderHall(hall) {
   tbody.innerHTML = hall.map((item, idx) => `
     <tr>
       <td>${idx + 1}</td>
-      <td>${item.nome}</td>
+      <td>${esc(item.nome)}</td>
       <td>${item.weekWins}</td>
       <td>${item.monthWins}</td>
       <td><strong>${item.total}</strong></td>
@@ -230,7 +239,7 @@ async function init() {
     return;
   }
 
-  filter.innerHTML = players.map(p => `<option value="${p.id}">${p.nome}</option>`).join("");
+  filter.innerHTML = players.map(p => `<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join("");
   renderTimeline(events, players[0].id);
 
   filter.addEventListener("change", () => {
