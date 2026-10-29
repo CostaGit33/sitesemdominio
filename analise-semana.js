@@ -123,37 +123,16 @@ function normalizePlayers(players) {
   });
 }
 
-function seedCurrentPeriod(history, players, semanaKey, mesKey, anoKey) {
+function seedCurrentPeriod(history, semanaKey, mesKey, anoKey) {
   if (!history.week) history.week = {};
   if (!history.month) history.month = {};
   if (!history.year) history.year = {};
 
-  const hasWeek = history.week[semanaKey] && Object.keys(history.week[semanaKey]).length;
-  const hasMonth = history.month[mesKey] && Object.keys(history.month[mesKey]).length;
-  const hasYear = history.year[anoKey] && Object.keys(history.year[anoKey]).length;
-
-  const eligiblePlayers = players.filter(p => Number(p.pontos) > 0);
-
-  if (!hasWeek) {
-    history.week[semanaKey] = {};
-    eligiblePlayers.forEach(p => {
-      history.week[semanaKey][p.id] = { nome: p.nome, delta: p.pontos };
-    });
-  }
-
-  if (!hasMonth) {
-    history.month[mesKey] = {};
-    eligiblePlayers.forEach(p => {
-      history.month[mesKey][p.id] = { nome: p.nome, delta: p.pontos };
-    });
-  }
-
-  if (!hasYear) {
-    history.year[anoKey] = {};
-    eligiblePlayers.forEach(p => {
-      history.year[anoKey][p.id] = { nome: p.nome, delta: p.pontos };
-    });
-  }
+  // A classificação atual é um total acumulado, não uma variação do período.
+  // Períodos sem histórico começam vazios e só recebem deltas observados no snapshot.
+  if (!history.week[semanaKey]) history.week[semanaKey] = {};
+  if (!history.month[mesKey]) history.month[mesKey] = {};
+  if (!history.year[anoKey]) history.year[anoKey] = {};
 }
 
 function pruneHistory(store) {
@@ -219,7 +198,7 @@ async function atualizarAnalise() {
   const history = safeParse(DELTA_KEY, { week: {}, month: {}, year: {} });
   const events = safeParse(DELTA_EVENTS_KEY, []);
 
-  seedCurrentPeriod(history, jogadores, semanaKey, mesKey, anoKey);
+  seedCurrentPeriod(history, semanaKey, mesKey, anoKey);
 
   const currentMap = {};
   jogadores.forEach(j => {
