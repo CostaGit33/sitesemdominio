@@ -97,7 +97,7 @@ function renderizar(lista) {
   listaOrdenada.forEach((j, index) => {
     const stats = obterStats(j);
     const media = obterMedia(stats);
-    const canvasId = `complete_chart_${j.id ?? index}`;
+    const canvasId = `complete_chart_${index}`;
     const card = document.createElement("article");
     card.className = "complete-card";
     card.style.animationDelay = `${Math.min(index * 55, 700)}ms`;
