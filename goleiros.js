@@ -3,6 +3,17 @@ import { desempenhoJogadores } from "./desempenho_data.js";
 
 const GOLEIROS_ENDPOINT = "/goleiros";
 
+function esc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+
+
 const radarOptions = {
   scales: {
     r: {
@@ -86,8 +97,8 @@ function renderTabela(lista, tbody) {
     <tr>
       <td>${String(i + 1).padStart(2, "0")}</td>
       <td>
-        <a href="jogador.html?id=${g.id}" class="player-link">
-          ${g.nome}
+        <a href="jogador.html?id=${encodeURIComponent(String(g.id ?? ""))}" class="player-link">
+          ${esc(g.nome)}
         </a>
       </td>
       <td><strong>${formatarPontos(g.pontos)}</strong></td>
@@ -120,14 +131,14 @@ function renderCards(lista, container) {
     if (i === 1) card.classList.add("top-2");
     if (i === 2) card.classList.add("top-3");
 
-    const canvasId = `chart_goleiro_${g.id || i}`;
+    const canvasId = `chart_goleiro_${i}`;
 
     card.innerHTML = `
       <div class="player-rank" style="position: absolute; top: 10px; left: 10px;">#${String(i + 1).padStart(2, "0")}</div>
       <div class="media-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(214, 40, 40, 0.2); color: #ef3434; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">${media.toFixed(1)}</div>
 
       <div class="player-name" style="margin-top: 10px; font-weight: bold; font-size: 1.1rem;">
-        <a href="jogador.html?id=${g.id}" class="player-link">${g.nome}</a>
+        <a href="jogador.html?id=${encodeURIComponent(String(g.id ?? ""))}" class="player-link">${esc(g.nome)}</a>
       </div>
 
       <canvas id="${canvasId}" style="max-width: 180px; margin: 15px 0;"></canvas>
@@ -150,8 +161,9 @@ function renderCards(lista, container) {
 
     container.appendChild(card);
 
-    const ctx = document.getElementById(canvasId).getContext("2d");
-    new Chart(ctx, {
+    const canvas = card.querySelector(`#${canvasId}`);
+    const ctx = canvas?.getContext("2d");
+    if (ctx && typeof window.Chart === "function") new window.Chart(ctx, {
       type: "radar",
       data: {
         labels: ["Def", "Atq", "Hab", "Vel", "Pas"],
