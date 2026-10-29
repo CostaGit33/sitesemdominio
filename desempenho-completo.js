@@ -6,6 +6,7 @@ const status = document.getElementById("completeStatus");
 const search = document.getElementById("searchPlayer");
 let jogadores = [];
 let estatisticasAnimadas = false;
+let charts = [];
 
 function normalizarNome(nome = "") {
   return String(nome)
@@ -85,6 +86,8 @@ function ordenarPorDesempenho(lista) {
 }
 
 function renderizar(lista) {
+  charts.forEach(chart => chart.destroy());
+  charts = [];
   container.innerHTML = "";
 
   if (!lista.length) {
@@ -153,7 +156,7 @@ function renderizar(lista) {
     if (stats && typeof window.Chart === "function") {
       const canvas = card.querySelector(`#${canvasId}`);
       if (canvas) {
-        new window.Chart(canvas, {
+        charts.push(new window.Chart(canvas, {
           type: "radar",
           data: {
             labels: ["Defesa", "Ataque", "Velocidade", "Habilidade", "Passe"],
@@ -183,7 +186,7 @@ function renderizar(lista) {
             },
             plugins: { legend: { display: false }, tooltip: { displayColors: false } }
           }
-        });
+        }));
       }
     }
   });
