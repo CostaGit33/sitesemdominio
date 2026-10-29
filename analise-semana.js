@@ -51,6 +51,15 @@ function toRanking(periodObj) {
     .sort((a, b) => b.delta - a.delta || a.nome.localeCompare(b.nome));
 }
 
+function esc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function formatDelta(value) {
   const n = Number(value) || 0;
   return `${n >= 0 ? "+" : ""}${n}`;
@@ -95,7 +104,7 @@ function renderTable(tbodyId, ranking) {
   tbody.innerHTML = ranking.map((item, idx) => `
     <tr>
       <td>${idx + 1}</td>
-      <td>${item.nome}</td>
+      <td>${esc(item.nome)}</td>
       <td><strong>${formatDelta(item.delta)}</strong></td>
     </tr>
   `).join("");
