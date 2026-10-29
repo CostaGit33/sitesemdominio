@@ -56,3 +56,50 @@
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Refinamento mobile — páginas que carregam este arquivo; classificação fica fora. */
+:where(.app-nav a, .install-btn, .home-tool, .list-tabs button, .toolbar button, .toolbar-main button) {
+  min-height: 44px;
+}
+:where(.app-nav a, .install-btn, .toolbar button, .toolbar-main button, .ghost) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+:where(.panel, .top-card, .winner-card, .complete-card, .home-tool, .players-list) {
+  border-radius: 16px;
+}
+:where(input, select, textarea) {
+  border-radius: 10px;
+}
+:where(input, select, textarea):focus-visible {
+  border-color: var(--fp-focus, #ffcc00);
+}
+@media (hover: hover) and (pointer: fine) {
+  :where(.player-row, .home-tool, .top-card, .winner-card, .complete-card) {
+    transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+  }
+}
+@media (max-width: 700px) {
+  :where(.home-page, .complete-section, .builder) {
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+  :where(.home-hero, .hero) {
+    border-radius: 18px;
+  }
+  :where(.home-tool) {
+    min-height: 0;
+    padding: .9rem;
+    gap: .75rem;
+  }
+  :where(.home-tool-icon) {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+  :where(.filter-row select, .toolbar input, .toolbar select) {
+    min-height: 44px;
+  }
+}
