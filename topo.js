@@ -62,11 +62,7 @@ function normalizePlayers(players) {
   }).sort((a, b) => b.pontos - a.pontos || a.nome.localeCompare(b.nome));
 }
 
-async function seedFromCurrentClassification(history) {
-  const jogadores = normalizePlayers(await apiRequest("/jogadores"))
-    .filter(j => Number(j.pontos) > 0);
-  if (!jogadores.length) return history;
-
+function seedFromCurrentClassification(history) {
   const weekKey = getISOWeekKey(new Date());
   const monthKey = getMonthKey(new Date());
   const yearKey = getYearKey(new Date());
@@ -75,26 +71,10 @@ async function seedFromCurrentClassification(history) {
   if (!history.month) history.month = {};
   if (!history.year) history.year = {};
 
-  if (!history.week[weekKey] || !Object.keys(history.week[weekKey]).length) {
-    history.week[weekKey] = {};
-    jogadores.forEach(j => {
-      history.week[weekKey][j.id] = { nome: j.nome, delta: j.pontos };
-    });
-  }
-
-  if (!history.month[monthKey] || !Object.keys(history.month[monthKey]).length) {
-    history.month[monthKey] = {};
-    jogadores.forEach(j => {
-      history.month[monthKey][j.id] = { nome: j.nome, delta: j.pontos };
-    });
-  }
-
-  if (!history.year[yearKey] || !Object.keys(history.year[yearKey]).length) {
-    history.year[yearKey] = {};
-    jogadores.forEach(j => {
-      history.year[yearKey][j.id] = { nome: j.nome, delta: j.pontos };
-    });
-  }
+  // Pontos acumulados não representam ganhos ocorridos nesta semana/mês/ano.
+  if (!history.week[weekKey]) history.week[weekKey] = {};
+  if (!history.month[monthKey]) history.month[monthKey] = {};
+  if (!history.year[yearKey]) history.year[yearKey] = {};
 
   localStorage.setItem(DELTA_KEY, JSON.stringify(history));
   return history;
