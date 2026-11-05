@@ -654,10 +654,12 @@ class _TeamsPageState extends State<TeamsPage> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return ListView(
-                children: [Padding(
-                  padding: EdgeInsets.all(48),
-                  child: Center(child: CircularProgressIndicator()),
-                )],
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(48),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ],
               );
             }
             if (snapshot.hasError) {
