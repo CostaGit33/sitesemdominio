@@ -45,6 +45,11 @@ void main() {
     );
 
     expect(find.text('Jogador de teste'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Composição da pontuação'),
+      300,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Composição da pontuação'), findsOneWidget);
     expect(find.text('Vitórias'), findsWidgets);
     expect(find.text('Total calculado'), findsOneWidget);
