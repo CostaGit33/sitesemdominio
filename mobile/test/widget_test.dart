@@ -26,7 +26,7 @@ void main() {
   });
   testWidgets('perfil detalha estatísticas e composição dos pontos', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: PlayerProfilePage(
           position: 1,
           player: {
