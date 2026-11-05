@@ -1438,12 +1438,11 @@ class _TeamsPageState extends State<TeamsPage> {
                                           fontWeight: FontWeight.bold, fontSize: 17)),
                                 ),
                                 Text(
-                                  members.length.toString() + ' jogadores • ' +
-                                      members.fold<int>(
-                                        0,
-                                        (sum, member) => sum +
-                                            (int.tryParse((member['pontos'] ?? 0).toString()) ?? 0),
-                                      ).toString() + ' pts',
+                                  '${members.length} jogadores • ${members.fold<int>(
+                                    0,
+                                    (sum, member) => sum +
+                                        (int.tryParse((member['pontos'] ?? 0).toString()) ?? 0),
+                                  )} pts',
                                   style: const TextStyle(
                                       color: Colors.white60, fontSize: 11),
                                 ),
