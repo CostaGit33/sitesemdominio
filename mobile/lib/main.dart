@@ -540,33 +540,46 @@ class _DataPageState extends State<DataPage> {
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
 
+  void _open(BuildContext context, Widget page) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(18),
-      children: const [
-        Text('Mais áreas',
+      children: [
+        const Text('Mais áreas',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         _FeatureNotice(
           icon: Icons.sports_handball_outlined,
           title: 'Goleiros',
-          description:
-              'A tela será conectada após confirmar o endpoint oficial de goleiros na API.',
+          description: 'Indicadores e classificação dos goleiros.',
+          onTap: () => _open(context, const DataPage(
+            title: 'Goleiros',
+            subtitle: 'Classificação e estatísticas',
+            endpoint: '/goleiros',
+            ranking: true,
+          )),
         ),
         _FeatureNotice(
           icon: Icons.groups_2_outlined,
           title: 'Montagem de times',
-          description:
-              'A integração será feita usando os limites e regras atuais do servidor.',
+          description: 'Consulte a montagem atual sem alterar seleções.',
+          onTap: () => _open(context, const TeamsPage()),
         ),
         _FeatureNotice(
           icon: Icons.calendar_month_outlined,
           title: 'Competições',
-          description:
-              'Histórico de competências disponível na API; tela detalhada será a próxima etapa.',
+          description: 'Histórico de competências e situação atual.',
+          onTap: () => _open(context, const DataPage(
+            title: 'Competições',
+            subtitle: 'Histórico de competências',
+            endpoint: '/competencias',
+          )),
         ),
-        _FeatureNotice(
+        const _FeatureNotice(
           icon: Icons.person_outline,
           title: 'Conta e preferências',
           description:
@@ -577,26 +590,140 @@ class MorePage extends StatelessWidget {
   }
 }
 
+class TeamsPage extends StatefulWidget {
+  const TeamsPage({super.key});
+
+  @override
+  State<TeamsPage> createState() => _TeamsPageState();
+}
+
+class _TeamsPageState extends State<TeamsPage> {
+  late Future<Map<String, dynamic>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<Map<String, dynamic>> _load() async {
+    final data = await FutPontosApi().get('/montar-times');
+    if (data is! Map) {
+      throw const FormatException('Formato inesperado na montagem dos times.');
+    }
+    return Map<String, dynamic>.from(data);
+  }
+
+  Future<void> _refresh() async {
+    final next = _load();
+    setState(() => _future = next);
+    await next;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Montagem de times')),
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const ListView(
+                children: [Padding(
+                  padding: EdgeInsets.all(48),
+                  child: Center(child: CircularProgressIndicator()),
+                )],
+              );
+            }
+            if (snapshot.hasError) {
+              return ListView(
+                children: [
+                  _ErrorPanel(
+                    message: 'Não foi possível carregar a montagem.',
+                    onRetry: _refresh,
+                  ),
+                ],
+              );
+            }
+            final selections = (snapshot.data?['selecoes'] as List<dynamic>?) ?? [];
+            if (selections.isEmpty) {
+              return const ListView(
+                children: [
+                  _EmptyPanel(message: 'Ainda não há jogadores selecionados.'),
+                ],
+              );
+            }
+            final rows = selections.whereType<Map>().toList();
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text('Partida: ${snapshot.data?['partida'] ?? 'atual'}'),
+                const SizedBox(height: 12),
+                for (var team = 1; team <= 5; team++)
+                  Builder(builder: (context) {
+                    final members = rows.where(
+                      (item) => item['time_num'] == team,
+                    ).toList();
+                    if (members.isEmpty) return const SizedBox.shrink();
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Time $team',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 17)),
+                            for (final member in members)
+                              ListTile(
+                                dense: true,
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(member['nome']?.toString() ?? 'Jogador'),
+                                trailing: Text(
+                                  '${member['pontos'] ?? 0} pts',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
 class _FeatureNotice extends StatelessWidget {
   const _FeatureNotice({
     required this.icon,
     required this.title,
     required this.description,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String description;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
+        onTap: onTap,
         leading: Icon(icon, color: const Color(0xFFFF7777)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(description),
-        isThreeLine: true,
+        trailing: onTap == null ? null : const Icon(Icons.chevron_right),
       ),
     );
   }
