@@ -381,8 +381,31 @@ class _HomeLink extends StatelessWidget {
         subtitle: Text(description),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
-          final shell = context.findAncestorStateOfType<_MainShellState>();
-          shell?.setState(() => shell._index = index);
+          final page = switch (index) {
+            1 => const DataPage(
+                title: 'Classificação',
+                subtitle: 'Pontuação oficial da competência atual',
+                endpoint: '/jogadores',
+                ranking: true,
+              ),
+            2 => const DataPage(
+                title: 'Jogadores',
+                subtitle: 'Perfis disponíveis no FutPontos',
+                endpoint: '/jogadores',
+              ),
+            3 => const DataPage(
+                title: 'Desempenho',
+                subtitle: 'Indicadores e avaliação técnica',
+                endpoint: '/desempenho',
+              ),
+            _ => const HomePage(),
+          };
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => Scaffold(
+              appBar: AppBar(title: Text(title)),
+              body: page,
+            )),
+          );
         },
       ),
     );
@@ -630,7 +653,7 @@ class _TeamsPageState extends State<TeamsPage> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const ListView(
+              return ListView(
                 children: [Padding(
                   padding: EdgeInsets.all(48),
                   child: Center(child: CircularProgressIndicator()),
@@ -649,8 +672,8 @@ class _TeamsPageState extends State<TeamsPage> {
             }
             final selections = (snapshot.data?['selecoes'] as List<dynamic>?) ?? [];
             if (selections.isEmpty) {
-              return const ListView(
-                children: [
+              return ListView(
+                children: const [
                   _EmptyPanel(message: 'Ainda não há jogadores selecionados.'),
                 ],
               );
