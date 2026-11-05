@@ -285,73 +285,428 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late Future<_DashboardData> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<_DashboardData> _load() async {
+    final api = FutPontosApi();
+    final values = await Future.wait<dynamic>([
+      api.list('/jogadores'),
+      api.list('/goleiros'),
+      api.get('/competencias/atual'),
+    ]);
+    return _DashboardData(
+      players: values[0] as List<Map<String, dynamic>>,
+      goalkeepers: values[1] as List<Map<String, dynamic>>,
+      competition: values[2] is Map
+          ? Map<String, dynamic>.from(values[2] as Map)
+          : <String, dynamic>{},
+    );
+  }
+
+  Future<void> _refresh() async {
+    final next = _load();
+    setState(() => _future = next);
+    await next;
+  }
+
+  int _sum(List<Map<String, dynamic>> players, String key) =>
+      players.fold<int>(0, (total, player) =>
+          total + (int.tryParse(player[key].toString()) ?? 0));
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF742326), Color(0xFF21151C)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: FutureBuilder<_DashboardData>(
+        future: _future,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final players = data?.players ?? const <Map<String, dynamic>>[];
+          final ranked = [...players]
+            ..sort((a, b) => (int.tryParse((b['pontos'] ?? 0).toString()) ?? 0)
+                .compareTo(int.tryParse((a['pontos'] ?? 0).toString()) ?? 0));
+          final summary = data?.competition['resumo'] is Map
+              ? Map<String, dynamic>.from(data!.competition['resumo'] as Map)
+              : <String, dynamic>{};
+          final loading = snapshot.connectionState == ConnectionState.waiting;
+
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
             children: [
-              const Text('CENTRAL DO JOGADOR',
-                  style: TextStyle(
-                      color: Color(0xFFFFB5B5),
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11)),
-              const SizedBox(height: 12),
-              Text('Seu futebol.\nSeus números.',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        height: 1.08,
-                      )),
-              const SizedBox(height: 10),
-              const Text(
-                'Acompanhe classificação, perfis e evolução dos jogadores.',
-                style: TextStyle(color: Colors.white70, height: 1.4),
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF742326), Color(0xFF21151C)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text('CENTRAL DO JOGADOR',
+                              style: TextStyle(
+                                  color: Color(0xFFFFB5B5),
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11)),
+                        ),
+                        IconButton(
+                          tooltip: 'Atualizar painel',
+                          onPressed: loading ? null : _refresh,
+                          icon: const Icon(Icons.refresh, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    Text('Seu futebol.\nSeus números.',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.w900, height: 1.08)),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Acompanhe a competição, compare desempenhos e veja os destaques.',
+                      style: TextStyle(color: Colors.white70, height: 1.4),
+                    ),
+                    if (data != null) ...[
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          _DashboardTag(
+                            icon: Icons.calendar_month_outlined,
+                            label: (data.competition['chave'] ?? 'Competência atual').toString(),
+                          ),
+                          _DashboardTag(
+                            icon: Icons.groups_outlined,
+                            label: (summary['jogadores'] ?? players.length).toString() + ' jogadores',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
               ),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('Visão geral',
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  if (loading)
+                    const SizedBox(
+                      width: 17,
+                      height: 17,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (snapshot.hasError && data == null)
+                _ErrorPanel(
+                  message: 'Não foi possível carregar os indicadores da API.',
+                  onRetry: _refresh,
+                )
+              else if (data == null)
+                const Padding(
+                  padding: EdgeInsets.all(30),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else ...[
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1.8,
+                  children: [
+                    _DashboardStat(icon: Icons.groups, label: 'Jogadores',
+                        value: (summary['jogadores'] ?? players.length).toString()),
+                    _DashboardStat(icon: Icons.stars, label: 'Pontos somados',
+                        value: (summary['pontos'] ?? _sum(players, 'pontos')).toString()),
+                    _DashboardStat(icon: Icons.sports_soccer, label: 'Gols',
+                        value: _sum(players, 'gols').toString()),
+                    _DashboardStat(icon: Icons.emoji_events_outlined, label: 'Vitórias',
+                        value: _sum(players, 'vitorias').toString()),
+                    _DashboardStat(icon: Icons.shield_outlined, label: 'Defesas',
+                        value: _sum(players, 'defesa').toString()),
+                    _DashboardStat(icon: Icons.warning_amber, label: 'Infrações',
+                        value: _sum(players, 'infracoes').toString()),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Destaques da classificação',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const Scaffold(
+                            appBar: _PageAppBar(title: 'Classificação'),
+                            body: DataPage(
+                              title: 'Classificação',
+                              subtitle: 'Pontuação oficial da competência atual',
+                              endpoint: '/jogadores',
+                              ranking: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                      child: const Text('Ver todos'),
+                    ),
+                  ],
+                ),
+                if (ranked.isEmpty)
+                  const _EmptyPanel(message: 'Ainda não há jogadores nesta competência.')
+                else ...[
+                  _DashboardLeader(player: ranked.first),
+                  const SizedBox(height: 8),
+                  for (var i = 1; i < ranked.length && i < 3; i++)
+                    _DashboardRankTile(player: ranked[i], position: i + 1),
+                ],
+                const SizedBox(height: 18),
+                const _HomeLink(
+                  icon: Icons.groups_outlined,
+                  title: 'Jogadores',
+                  description: 'Perfis e números individuais',
+                  index: 2,
+                ),
+                const _HomeLink(
+                  icon: Icons.insights_outlined,
+                  title: 'Desempenho técnico',
+                  description: 'Avaliações e indicadores individuais',
+                  index: 3,
+                ),
+                _FeatureNotice(
+                  icon: Icons.sports_handball_outlined,
+                  title: 'Goleiros',
+                  description: data.goalkeepers.length.toString() + ' registros disponíveis',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const DataPage(
+                        title: 'Goleiros',
+                        subtitle: 'Classificação e estatísticas',
+                        endpoint: '/goleiros',
+                        ranking: true,
+                        kind: DataPageKind.goalkeepers,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 10),
+              const _ApiStatusCard(),
+              const SizedBox(height: 6),
+              const Text(
+                'Os totais são calculados com os registros retornados pela API e representam a competência atual.',
+                style: TextStyle(color: Colors.white38, fontSize: 11, height: 1.4),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _DashboardData {
+  const _DashboardData({
+    required this.players,
+    required this.goalkeepers,
+    required this.competition,
+  });
+
+  final List<Map<String, dynamic>> players;
+  final List<Map<String, dynamic>> goalkeepers;
+  final Map<String, dynamic> competition;
+}
+
+class _DashboardTag extends StatelessWidget {
+  const _DashboardTag({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: .2),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: Colors.white70),
+              const SizedBox(width: 6),
+              Text(label, style: const TextStyle(fontSize: 11, color: Colors.white)),
             ],
           ),
         ),
-        const SizedBox(height: 24),
-        Text('Acompanhe o FutPontos',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                )),
-        const SizedBox(height: 12),
-        const _HomeLink(
-            icon: Icons.leaderboard_outlined,
-            title: 'Classificação',
-            description: 'Posições e pontuação da competição',
-            index: 1),
-        const _HomeLink(
-            icon: Icons.groups_outlined,
-            title: 'Jogadores',
-            description: 'Consulte os perfis e estatísticas',
-            index: 2),
-        const _HomeLink(
-            icon: Icons.insights_outlined,
-            title: 'Desempenho completo',
-            description: 'Indicadores e avaliação técnica',
-            index: 3),
-        const SizedBox(height: 16),
-        const _ApiStatusCard(),
-      ],
+      );
+}
+
+class _DashboardStat extends StatelessWidget {
+  const _DashboardStat({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(13),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141A24),
+          borderRadius: BorderRadius.circular(17),
+          border: Border.all(color: Colors.white.withValues(alpha: .06)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, color: const Color(0xFFFF7777), size: 19),
+            Text(value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w900)),
+            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+          ],
+        ),
+      );
+}
+
+class _DashboardLeader extends StatelessWidget {
+  const _DashboardLeader({required this.player});
+
+  final Map<String, dynamic> player;
+
+  @override
+  Widget build(BuildContext context) {
+    final photo = player['foto']?.toString();
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 27,
+              backgroundColor: const Color(0x33E53935),
+              backgroundImage: photo == null || photo.isEmpty ? null : NetworkImage(photo),
+              child: photo == null || photo.isEmpty
+                  ? const Icon(Icons.person, color: Color(0xFFFF7777), size: 28)
+                  : null,
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('1º LUGAR',
+                      style: TextStyle(
+                          color: Color(0xFFFF7777),
+                          fontSize: 10,
+                          letterSpacing: 1.4,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(player['nome']?.toString() ?? 'Jogador',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(
+                    (player['vitorias'] ?? 0).toString() + ' vitórias • ' +
+                        (player['gols'] ?? 0).toString() + ' gols',
+                    style: const TextStyle(color: Colors.white60, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                Text((player['pontos'] ?? 0).toString(),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                const Text('PONTOS',
+                    style: TextStyle(fontSize: 9, color: Colors.white54)),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
+}
+
+class _DashboardRankTile extends StatelessWidget {
+  const _DashboardRankTile({required this.player, required this.position});
+
+  final Map<String, dynamic> player;
+  final int position;
+
+  @override
+  Widget build(BuildContext context) => Card(
+        margin: const EdgeInsets.only(bottom: 7),
+        child: ListTile(
+          dense: true,
+          leading: CircleAvatar(
+            radius: 16,
+            backgroundColor: const Color(0x22E53935),
+            child: Text(position.toString(),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+          ),
+          title: Text(player['nome']?.toString() ?? 'Jogador',
+              style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(
+              (player['vitorias'] ?? 0).toString() + ' vitórias • ' +
+                  (player['gols'] ?? 0).toString() + ' gols',
+              style: const TextStyle(fontSize: 11, color: Colors.white54)),
+          trailing: Text((player['pontos'] ?? 0).toString() + ' pts',
+              style: const TextStyle(fontWeight: FontWeight.w900)),
+        ),
+      );
+}
+
+class _PageAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _PageAppBar({required this.title});
+
+  final String title;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) => AppBar(title: Text(title));
 }
 
 class _HomeLink extends StatelessWidget {
