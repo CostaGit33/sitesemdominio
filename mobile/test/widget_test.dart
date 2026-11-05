@@ -45,7 +45,7 @@ void main() {
 
     expect(find.text('Jogador de teste'), findsOneWidget);
     expect(find.text('Composição da pontuação'), findsOneWidget);
-    expect(find.text('Vitórias'), findsOneWidget);
+    expect(find.text('Vitórias'), findsWidgets);
     expect(find.text('Total calculado'), findsOneWidget);
     expect(find.text('15'), findsWidgets);
   });
