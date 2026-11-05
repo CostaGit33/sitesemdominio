@@ -23,4 +23,31 @@ void main() {
       findsOneWidget,
     );
   });
+  testWidgets('perfil detalha estatísticas e composição dos pontos', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PlayerProfilePage(
+          position: 1,
+          player: {
+            'id': 7,
+            'nome': 'Jogador de teste',
+            'pontos': 15,
+            'vitorias': 2,
+            'gols': 3,
+            'empate': 1,
+            'defesa': 4,
+            'infracoes': 1,
+            'competencia': '2026-11',
+          },
+        ),
+      ),
+    );
+
+    expect(find.text('Jogador de teste'), findsOneWidget);
+    expect(find.text('Composição da pontuação'), findsOneWidget);
+    expect(find.text('Vitórias'), findsOneWidget);
+    expect(find.text('Total calculado'), findsOneWidget);
+    expect(find.text('15'), findsWidgets);
+  });
+
 }
