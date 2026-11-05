@@ -1394,11 +1394,32 @@ class _TeamsPageState extends State<TeamsPage> {
               );
             }
             final rows = selections.whereType<Map>().toList();
+            final activeTeams = rows.map((item) => item['time_num']).toSet().length;
+            final totalPoints = rows.fold<int>(
+              0,
+              (total, item) =>
+                  total + (int.tryParse((item['pontos'] ?? 0).toString()) ?? 0),
+            );
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 Text('Partida: ${snapshot.data?['partida'] ?? 'atual'}'),
                 const SizedBox(height: 12),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(13),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _MetricChip(label: 'Selecionados', value: rows.length.toString()),
+                        _MetricChip(label: 'Times ativos', value: activeTeams.toString()),
+                        _MetricChip(label: 'Pontos distribuídos', value: totalPoints.toString()),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 for (var team = 1; team <= 5; team++)
                   Builder(builder: (context) {
                     final members = rows.where(
@@ -1411,9 +1432,26 @@ class _TeamsPageState extends State<TeamsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Time $team',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 17)),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text('Time $team',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 17)),
+                                ),
+                                Text(
+                                  members.length.toString() + ' jogadores • ' +
+                                      members.fold<int>(
+                                        0,
+                                        (sum, member) => sum +
+                                            (int.tryParse((member['pontos'] ?? 0).toString()) ?? 0),
+                                      ).toString() + ' pts',
+                                  style: const TextStyle(
+                                      color: Colors.white60, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
                             for (final member in members)
                               ListTile(
                                 dense: true,
