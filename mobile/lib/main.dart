@@ -398,6 +398,7 @@ class _HomeLink extends StatelessWidget {
                 title: 'Desempenho',
                 subtitle: 'Indicadores e avaliação técnica',
                 endpoint: '/desempenho',
+                kind: DataPageKind.performance,
               ),
             _ => const HomePage(),
           };
@@ -554,9 +555,7 @@ class _DataPageState extends State<DataPage> {
       );
     }
 
-    final defenseKey = widget.kind == DataPageKind.goalkeepers
-        ? 'defesa'
-        : 'defesa';
+    const defenseKey = 'defesa';
     return Card(
       margin: const EdgeInsets.only(bottom: 9),
       child: ListTile(
