@@ -336,9 +336,8 @@ class _HomePageState extends State<HomePage> {
         builder: (context, snapshot) {
           final data = snapshot.data;
           final players = data?.players ?? const <Map<String, dynamic>>[];
-          final ranked = [...players]
-            ..sort((a, b) => (int.tryParse((b['pontos'] ?? 0).toString()) ?? 0)
-                .compareTo(int.tryParse((a['pontos'] ?? 0).toString()) ?? 0));
+          // A API já retorna o ranking oficial com os critérios de desempate.
+          final ranked = [...players];
           final summary = data?.competition['resumo'] is Map
               ? Map<String, dynamic>.from(data!.competition['resumo'] as Map)
               : <String, dynamic>{};
