@@ -396,7 +396,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           _DashboardTag(
                             icon: Icons.groups_outlined,
-                            label: (summary['jogadores'] ?? players.length).toString() + ' jogadores',
+                            label: '${summary['jogadores'] ?? players.length} jogadores',
                           ),
                         ],
                       ),
@@ -504,7 +504,7 @@ class _HomePageState extends State<HomePage> {
                 _FeatureNotice(
                   icon: Icons.sports_handball_outlined,
                   title: 'Goleiros',
-                  description: data.goalkeepers.length.toString() + ' registros disponíveis',
+                  description: '${data.goalkeepers.length} registros disponíveis',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const DataPage(
@@ -645,8 +645,7 @@ class _DashboardLeader extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                   Text(
-                    (player['vitorias'] ?? 0).toString() + ' vitórias • ' +
-                        (player['gols'] ?? 0).toString() + ' gols',
+                    '${player['vitorias'] ?? 0} vitórias • ${player['gols'] ?? 0} gols',
                     style: const TextStyle(color: Colors.white60, fontSize: 11),
                   ),
                 ],
@@ -687,10 +686,9 @@ class _DashboardRankTile extends StatelessWidget {
           title: Text(player['nome']?.toString() ?? 'Jogador',
               style: const TextStyle(fontWeight: FontWeight.w700)),
           subtitle: Text(
-              (player['vitorias'] ?? 0).toString() + ' vitórias • ' +
-                  (player['gols'] ?? 0).toString() + ' gols',
+              '${player['vitorias'] ?? 0} vitórias • ${player['gols'] ?? 0} gols',
               style: const TextStyle(fontSize: 11, color: Colors.white54)),
-          trailing: Text((player['pontos'] ?? 0).toString() + ' pts',
+          trailing: Text('${player['pontos'] ?? 0} pts',
               style: const TextStyle(fontWeight: FontWeight.w900)),
         ),
       );
@@ -868,8 +866,8 @@ class _DataPageState extends State<DataPage> {
                     MaterialPageRoute<void>(
                       builder: (_) => DataPage(
                         title: 'Jogadores da competência',
-                        subtitle: 'Classificação histórica • ' + _value(item, 'chave'),
-                        endpoint: '/competencias/' + _value(item, 'id') + '/jogadores',
+                        subtitle: 'Classificação histórica • ${_value(item, 'chave')}',
+                        endpoint: '/competencias/${_value(item, 'id')}/jogadores',
                         ranking: true,
                       ),
                     ),
@@ -1131,10 +1129,10 @@ class PlayerProfilePage extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall
                       ?.copyWith(fontWeight: FontWeight.w900),
                 ),
-                Text('Posição no ranking: ' + position.toString() + 'º',
+                Text('Posição no ranking: $positionº',
                     style: const TextStyle(color: Colors.white60)),
                 if (player['competencia'] != null)
-                  Text('Competência ' + player['competencia'].toString(),
+                  Text('Competência ${player['competencia']}',
                       style: const TextStyle(color: Colors.white54, fontSize: 12)),
               ],
             ),
@@ -1185,11 +1183,11 @@ class PlayerProfilePage extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _PointLine(label: 'Vitórias', detail: wins.toString() + ' × 3', value: '+' + (wins * 3).toString()),
-                _PointLine(label: 'Gols', detail: goals.toString() + ' × 2', value: '+' + (goals * 2).toString()),
-                _PointLine(label: 'Empates', detail: draws.toString() + ' × 1', value: '+' + draws.toString()),
-                _PointLine(label: 'Defesas', detail: defense.toString() + ' × 1', value: '+' + defense.toString()),
-                _PointLine(label: 'Infrações', detail: fouls.toString() + ' × -2', value: '-' + (fouls * 2).toString()),
+                _PointLine(label: 'Vitórias', detail: '$wins × 3', value: '+${wins * 3}'),
+                _PointLine(label: 'Gols', detail: '$goals × 2', value: '+${goals * 2}'),
+                _PointLine(label: 'Empates', detail: '$draws × 1', value: '+$draws'),
+                _PointLine(label: 'Defesas', detail: '$defense × 1', value: '+$defense'),
+                _PointLine(label: 'Infrações', detail: '$fouls × -2', value: '-${fouls * 2}'),
                 const Divider(height: 1),
                 _PointLine(
                   label: 'Total calculado',
