@@ -246,6 +246,7 @@ class _MainShellState extends State<MainShell> {
           title: 'Desempenho',
           subtitle: 'Indicadores e avaliação técnica',
           endpoint: '/desempenho',
+          kind: DataPageKind.performance,
         ),
       _ => const MorePage(),
     };
@@ -440,6 +441,8 @@ class _ApiStatusCard extends StatelessWidget {
   }
 }
 
+enum DataPageKind { players, performance, competitions, goalkeepers }
+
 class DataPage extends StatefulWidget {
   const DataPage({
     super.key,
@@ -447,12 +450,14 @@ class DataPage extends StatefulWidget {
     required this.subtitle,
     required this.endpoint,
     this.ranking = false,
+    this.kind = DataPageKind.players,
   });
 
   final String title;
   final String subtitle;
   final String endpoint;
   final bool ranking;
+  final DataPageKind kind;
 
   @override
   State<DataPage> createState() => _DataPageState();
@@ -476,6 +481,110 @@ class _DataPageState extends State<DataPage> {
   String _value(Map<String, dynamic> item, String key) {
     final value = item[key];
     return value == null || value.toString().isEmpty ? '—' : value.toString();
+  }
+
+  Widget _itemCard(Map<String, dynamic> item, int index) {
+    if (widget.kind == DataPageKind.competitions) {
+      final status = _value(item, 'status');
+      return Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ListTile(
+          leading: const CircleAvatar(child: Icon(Icons.calendar_month_outlined)),
+          title: Text(_value(item, 'nome'),
+              style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(
+            '${_value(item, 'chave')} • ${status == 'aberta' ? 'Em andamento' : status == 'fechada' ? 'Encerrada' : status} • '
+            '${_value(item, 'jogadores')} jogadores',
+          ),
+          trailing: status == 'aberta'
+              ? const Icon(Icons.radio_button_checked, color: Colors.greenAccent)
+              : const Icon(Icons.history),
+        ),
+      );
+    }
+
+    if (widget.kind == DataPageKind.performance) {
+      final evaluation = item['avaliacao'] is Map
+          ? Map<String, dynamic>.from(item['avaliacao'] as Map)
+          : <String, dynamic>{};
+      String metric(String key) {
+        final value = evaluation[key];
+        return value == null ? '—' : value.toString();
+      }
+
+      return Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(_value(item, 'nome'),
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                  Text('${_value(item, 'pontos')} pts',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w900, fontSize: 17)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _MetricChip(label: 'Ataque', value: metric('ataque')),
+                  _MetricChip(label: 'Defesa', value: metric('defesa')),
+                  _MetricChip(label: 'Velocidade', value: metric('velocidade')),
+                  _MetricChip(label: 'Habilidade', value: metric('habilidade')),
+                  _MetricChip(label: 'Passe', value: metric('passe')),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Vitórias ${_value(item, 'vitorias')} • Gols ${_value(item, 'gols')} • '
+                'Defesas ${_value(item, 'defesaClassificacao')}',
+                style: const TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final defenseKey = widget.kind == DataPageKind.goalkeepers
+        ? 'defesa'
+        : 'defesa';
+    return Card(
+      margin: const EdgeInsets.only(bottom: 9),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: const Color(0x22E53935),
+          child: Text(
+            widget.ranking ? '${index + 1}' : 'FP',
+            style: const TextStyle(
+                color: Color(0xFFFF7777), fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: Text(_value(item, 'nome'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text(
+          'Vitórias ${_value(item, 'vitorias')} • Gols ${_value(item, 'gols')} • '
+          'Defesas ${_value(item, defenseKey)}',
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(_value(item, 'pontos'),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            const Text('PTS',
+                style: TextStyle(fontSize: 9, color: Colors.white54)),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -516,46 +625,34 @@ class _DataPageState extends State<DataPage> {
               return Column(
                 children: [
                   for (var i = 0; i < items.length; i++)
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 9),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0x22E53935),
-                          child: Text(
-                            widget.ranking ? '${i + 1}' : 'FP',
-                            style: const TextStyle(
-                                color: Color(0xFFFF7777),
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        title: Text(_value(items[i], 'nome'),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w700)),
-                        subtitle: Text(
-                          'Vitórias ${_value(items[i], 'vitorias')}  •  '
-                          'Gols ${_value(items[i], 'gols')}  •  '
-                          'Defesas ${_value(items[i], 'defesa')}',
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(_value(items[i], 'pontos'),
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900)),
-                            const Text('PTS',
-                                style: TextStyle(
-                                    fontSize: 9, color: Colors.white54)),
-                          ],
-                        ),
-                      ),
-                    ),
+                    _itemCard(items[i], i),
                 ],
               );
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class _MetricChip extends StatelessWidget {
+  const _MetricChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFF202632),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text('$label: $value',
+          style: const TextStyle(fontSize: 12, color: Colors.white70)),
     );
   }
 }
@@ -584,6 +681,7 @@ class MorePage extends StatelessWidget {
             subtitle: 'Classificação e estatísticas',
             endpoint: '/goleiros',
             ranking: true,
+            kind: DataPageKind.goalkeepers,
           )),
         ),
         _FeatureNotice(
@@ -600,6 +698,7 @@ class MorePage extends StatelessWidget {
             title: 'Competições',
             subtitle: 'Histórico de competências',
             endpoint: '/competencias',
+            kind: DataPageKind.competitions,
           )),
         ),
         const _FeatureNotice(
