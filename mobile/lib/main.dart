@@ -821,11 +821,19 @@ class DataPage extends StatefulWidget {
 
 class _DataPageState extends State<DataPage> {
   late Future<List<Map<String, dynamic>>> _future;
+  final TextEditingController _searchController = TextEditingController();
+  String _search = '';
 
   @override
   void initState() {
     super.initState();
     _future = FutPontosApi().list(widget.endpoint);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _refresh() async {
@@ -937,6 +945,16 @@ class _DataPageState extends State<DataPage> {
                 style: TextStyle(fontSize: 9, color: Colors.white54)),
           ],
         ),
+        onTap: widget.kind == DataPageKind.players || widget.ranking
+            ? () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => PlayerProfilePage(
+                      player: item,
+                      position: index + 1,
+                    ),
+                  ),
+                )
+            : null,
       ),
     );
   }
@@ -976,10 +994,39 @@ class _DataPageState extends State<DataPage> {
               if (items.isEmpty) {
                 return const _EmptyPanel(message: 'Nenhum registro disponível.');
               }
+              final filtered = items.where((item) {
+                final name = (item['nome'] ?? '').toString().toLowerCase();
+                return name.contains(_search.trim().toLowerCase());
+              }).toList();
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (var i = 0; i < items.length; i++)
-                    _itemCard(items[i], i),
+                  _DataSummary(items: items, kind: widget.kind),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _searchController,
+                    onChanged: (value) => setState(() => _search = value),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar jogador pelo nome',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _search.isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: 'Limpar busca',
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _search = '');
+                              },
+                              icon: const Icon(Icons.close),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (filtered.isEmpty)
+                    const _EmptyPanel(message: 'Nenhum resultado para essa busca.')
+                  else
+                    for (var i = 0; i < filtered.length; i++)
+                      _itemCard(filtered[i], i),
                 ],
               );
             },
@@ -990,6 +1037,202 @@ class _DataPageState extends State<DataPage> {
   }
 }
 
+
+class _DataSummary extends StatelessWidget {
+  const _DataSummary({required this.items, required this.kind});
+
+  final List<Map<String, dynamic>> items;
+  final DataPageKind kind;
+
+  int _sum(String key) => items.fold<int>(
+        0,
+        (total, item) => total + (int.tryParse((item[key] ?? 0).toString()) ?? 0),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _MetricChip(label: 'Registros', value: items.length.toString()),
+        if (kind != DataPageKind.competitions) ...[
+          _MetricChip(label: 'Pontos', value: _sum('pontos').toString()),
+          _MetricChip(label: 'Gols', value: _sum('gols').toString()),
+          _MetricChip(label: 'Vitórias', value: _sum('vitorias').toString()),
+        ],
+      ],
+    );
+  }
+}
+
+class PlayerProfilePage extends StatelessWidget {
+  const PlayerProfilePage({
+    super.key,
+    required this.player,
+    required this.position,
+  });
+
+  final Map<String, dynamic> player;
+  final int position;
+
+  int _number(String key) =>
+      int.tryParse((player[key] ?? 0).toString()) ?? 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final photo = player['foto']?.toString();
+    final wins = _number('vitorias');
+    final draws = _number('empate');
+    final goals = _number('gols');
+    final defense = _number('defesa');
+    final fouls = _number('infracoes');
+    final points = _number('pontos');
+    final calculated = wins * 3 + goals * 2 + draws + defense - fouls * 2;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Perfil do jogador')),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Center(
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 43,
+                  backgroundColor: const Color(0x33E53935),
+                  backgroundImage:
+                      photo == null || photo.isEmpty ? null : NetworkImage(photo),
+                  child: photo == null || photo.isEmpty
+                      ? const Icon(Icons.person, size: 44, color: Color(0xFFFF7777))
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  (player['nome'] ?? 'Jogador').toString(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w900),
+                ),
+                Text('Posição no ranking: ' + position.toString() + 'º',
+                    style: const TextStyle(color: Colors.white60)),
+                if (player['competencia'] != null)
+                  Text('Competência ' + player['competencia'].toString(),
+                      style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF742326), Color(0xFF21151C)],
+              ),
+            ),
+            child: Column(
+              children: [
+                const Text('PONTUAÇÃO ATUAL',
+                    style: TextStyle(color: Colors.white70, letterSpacing: 1.5)),
+                Text(points.toString(),
+                    style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w900)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text('Estatísticas da competência',
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.9,
+            children: [
+              _DashboardStat(icon: Icons.emoji_events, label: 'Vitórias', value: wins.toString()),
+              _DashboardStat(icon: Icons.sports_soccer, label: 'Gols', value: goals.toString()),
+              _DashboardStat(icon: Icons.shield, label: 'Defesas', value: defense.toString()),
+              _DashboardStat(icon: Icons.handshake_outlined, label: 'Empates', value: draws.toString()),
+              _DashboardStat(icon: Icons.warning_amber, label: 'Infrações', value: fouls.toString()),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text('Composição da pontuação',
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Card(
+            child: Column(
+              children: [
+                _PointLine(label: 'Vitórias', detail: wins.toString() + ' × 3', value: '+' + (wins * 3).toString()),
+                _PointLine(label: 'Gols', detail: goals.toString() + ' × 2', value: '+' + (goals * 2).toString()),
+                _PointLine(label: 'Empates', detail: draws.toString() + ' × 1', value: '+' + draws.toString()),
+                _PointLine(label: 'Defesas', detail: defense.toString() + ' × 1', value: '+' + defense.toString()),
+                _PointLine(label: 'Infrações', detail: fouls.toString() + ' × -2', value: '-' + (fouls * 2).toString()),
+                const Divider(height: 1),
+                _PointLine(
+                  label: 'Total calculado',
+                  detail: 'Conferência da regra atual',
+                  value: calculated.toString(),
+                  strong: true,
+                ),
+              ],
+            ),
+          ),
+          if (calculated != points)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                'A composição calculada difere do total recebido da API. O total oficial exibido permanece o valor da API.',
+                style: TextStyle(color: Colors.orangeAccent, fontSize: 12),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PointLine extends StatelessWidget {
+  const _PointLine({
+    required this.label,
+    required this.detail,
+    required this.value,
+    this.strong = false,
+  });
+
+  final String label;
+  final String detail;
+  final String value;
+  final bool strong;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: TextStyle(fontWeight: strong ? FontWeight.w900 : FontWeight.w600)),
+                  Text(detail, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                ],
+              ),
+            ),
+            Text(value,
+                style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: strong ? const Color(0xFFFF7777) : Colors.white)),
+          ],
+        ),
+      );
+}
 
 class _MetricChip extends StatelessWidget {
   const _MetricChip({required this.label, required this.value});
