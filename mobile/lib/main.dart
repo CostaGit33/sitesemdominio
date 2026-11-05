@@ -305,8 +305,8 @@ class _HomePageState extends State<HomePage> {
     final api = FutPontosApi();
     final values = await Future.wait<dynamic>([
       api.list('/jogadores'),
-      api.list('/goleiros'),
-      api.get('/competencias/atual'),
+      api.list('/goleiros').catchError((_) => <Map<String, dynamic>>[]),
+      api.get('/competencias/atual').catchError((_) => <String, dynamic>{}),
     ]);
     return _DashboardData(
       players: values[0] as List<Map<String, dynamic>>,
@@ -863,6 +863,18 @@ class _DataPageState extends State<DataPage> {
           trailing: status == 'aberta'
               ? const Icon(Icons.radio_button_checked, color: Colors.greenAccent)
               : const Icon(Icons.history),
+          onTap: item['id'] == null
+              ? null
+              : () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => DataPage(
+                        title: 'Jogadores da competência',
+                        subtitle: 'Classificação histórica • ' + _value(item, 'chave'),
+                        endpoint: '/competencias/' + _value(item, 'id') + '/jogadores',
+                        ranking: true,
+                      ),
+                    ),
+                  ),
         ),
       );
     }
@@ -1060,6 +1072,12 @@ class _DataSummary extends StatelessWidget {
           _MetricChip(label: 'Pontos', value: _sum('pontos').toString()),
           _MetricChip(label: 'Gols', value: _sum('gols').toString()),
           _MetricChip(label: 'Vitórias', value: _sum('vitorias').toString()),
+          _MetricChip(
+            label: 'Defesas',
+            value: _sum(kind == DataPageKind.performance
+                ? 'defesaClassificacao'
+                : 'defesa').toString(),
+          ),
         ],
       ],
     );
