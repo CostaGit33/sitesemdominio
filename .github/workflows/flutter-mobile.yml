@@ -31,7 +31,7 @@ jobs:
           cache: true
 
       - name: Generate Android project files
-        run: flutter create --platforms=android --project-name futpontos .
+        run: flutter create --platforms=android --project-name futpontos --org com.futpontos .
 
       - name: Install dependencies
         run: flutter pub get
