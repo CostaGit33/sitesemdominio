@@ -10,7 +10,26 @@ let listaAnimada = false;
 function n(value) { const result = Number(value); return Number.isFinite(result) ? Math.max(0, result) : 0; }
 function text(value) { return value === undefined || value === null || String(value).trim() === "" ? "Não informado" : String(value); }
 function esc(value) { return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]); }
-function image(player, className) { const size = className === "hero-photo" ? "min(116px, 100%)" : "54px"; return `<img class="${className}" src="${esc(player.foto || "futponts_large.png")}" alt="Foto de ${esc(player.nome)}" width="116" height="116" loading="lazy" style="display:block;width:${size};height:${size};max-width:${size};max-height:${size};object-fit:cover;border-radius:50%;" onerror="this.src='futponts_large.png'">`; }
+function playerPhotoUrl(player) {
+  const candidates = [player?.foto, player?.foto_url, player?.imagem, player?.avatar, player?.photo, player?.image];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string" || !candidate.trim()) continue;
+    try {
+      const url = new URL(candidate.trim(), document.baseURI);
+      if (url.protocol === "http:" || url.protocol === "https:") return url.href;
+    } catch {
+      // Tenta o próximo campo quando o valor não é uma URL válida.
+    }
+  }
+  return "futponts_large.png";
+}
+
+function image(player, className) {
+  const size = className === "hero-photo" ? "min(116px, 100%)" : "54px";
+  const src = esc(playerPhotoUrl(player));
+  const alt = esc(player?.nome || "Jogador");
+  return "<img class=\"" + esc(className) + "\" src=\"" + src + "\" alt=\"Foto de " + alt + "\" width=\"116\" height=\"116\" loading=\"lazy\" decoding=\"async\" style=\"display:block;width:" + size + ";height:" + size + ";max-width:" + size + ";max-height:" + size + ";object-fit:cover;border-radius:50%;\" onerror=\"this.onerror=null;this.src='futponts_large.png';this.classList.add('photo-fallback')\">";
+}
 function technical(player, performance) { return performance.find(item => String(item.id) === String(player.id))?.avaliacao || {}; }
 
 function renderList(players) {
