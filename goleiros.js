@@ -1,239 +1,76 @@
-﻿import { apiRequest, calculatePoints } from "./globais.js";
-import { desempenhoJogadores } from "./desempenho_data.js";
+import { apiRequest } from "./globais.js";
 
-const GOLEIROS_ENDPOINT = "/goleiros";
+const endpoint = "/goleiros";
+const esc = value => String(value ?? "").replace(/[&<>'"]/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"
+}[c]));
+const number = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+const points = value => number(value).toLocaleString("pt-BR");
 
-function esc(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+function normalize(list) {
+  if (!Array.isArray(list)) return [];
+  return list.map(g => ({
+    ...g,
+    pontos: number(g.pontos),
+    vitorias: number(g.vitorias),
+    empate: number(g.empate ?? g.empates),
+    gols: number(g.gols),
+    defesa: number(g.defesa ?? g.defesas),
+    infracoes: number(g.infracoes),
+    jogos_disputados: number(g.jogos_disputados),
+    derrotas: number(g.derrotas),
+    gols_sofridos: number(g.gols_sofridos),
+    media_gols_sofridos: number(g.media_gols_sofridos),
+    aproveitamento_vitorias: number(g.aproveitamento_vitorias)
+  })).sort((a,b) =>
+    b.pontos-a.pontos || b.vitorias-a.vitorias || b.gols-a.gols || b.defesa-a.defesa
+  );
 }
 
-
-
-const radarOptions = {
-  scales: {
-    r: {
-      min: 0,
-      max: 16,
-      ticks: { stepSize: 4, color: "#fff", backdropColor: "transparent", display: false },
-      grid: { color: "rgba(255,255,255,0.1)" },
-      angleLines: { color: "rgba(255,255,255,0.1)" },
-      pointLabels: { color: "#aaa", font: { size: 10 } }
-    }
-  },
-  plugins: {
-    legend: { display: false },
-    tooltip: { enabled: true }
-  },
-  elements: { line: { tension: 0.2 } }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  carregarGoleiros();
-});
-
-async function carregarGoleiros() {
-  const tbody = document.getElementById("tabela-goleiros");
-  const cardsContainer = document.getElementById("cards-goleiros");
-
-  try {
-    const dados = await apiRequest(GOLEIROS_ENDPOINT);
-    const goleirosProcessados = normalizar(dados);
-
-    if (tbody) renderTabela(goleirosProcessados, tbody);
-    if (cardsContainer) renderCards(goleirosProcessados, cardsContainer);
-  } catch (err) {
-    console.error("Erro ao carregar goleiros:", err);
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="8" style="text-align:center; padding:2rem;">
-            Erro ao carregar dados dos goleiros.
-          </td>
-        </tr>
-      `;
-    }
-  }
-}
-
-function normalizar(lista) {
-  if (!Array.isArray(lista)) return [];
-
-  return lista
-    .map(g => {
-      const v = Number(g.vitorias) || 0;
-      const e = Number(g.empate) || 0;
-      const d = Number(g.defesa) || 0;
-      const gols = Number(g.gols) || 0;
-      const inf = Number(g.infracoes) || 0;
-
-      return {
-        ...g,
-        vitorias: v,
-        empate: e,
-        defesa: d,
-        gols,
-        infracoes: inf,
-        pontos: calculatePoints(v, e, d, gols, inf)
-      };
-    })
-    .sort((a, b) =>
-      b.pontos - a.pontos ||
-      b.defesa - a.defesa ||
-      b.vitorias - a.vitorias
-    );
-}
-
-function formatarPontos(valor) {
-  return String(Math.floor(valor)).padStart(2, "0");
-}
-
-function renderTabela(lista, tbody) {
-  tbody.innerHTML = lista.map((g, i) => `
+function renderTable(list, tbody) {
+  tbody.innerHTML = list.map((g,i) => `
     <tr>
-      <td>${String(i + 1).padStart(2, "0")}</td>
-      <td>
-        <a href="jogador.html?id=${encodeURIComponent(String(g.id ?? ""))}" class="player-link">
-          ${esc(g.nome)}
+      <td>${String(i+1).padStart(2,"0")}</td>
+      <td><a class="player-link" href="goleiro.html?id=${encodeURIComponent(g.id)}">${esc(g.nome)}</a></td>
+      <td><strong>${points(g.pontos)}</strong></td>
+      <td>${g.vitorias}</td><td>${g.empate}</td><td>${g.gols}</td><td>${g.defesa}</td><td>${g.infracoes}</td>
+    </tr>`).join("") || '<tr><td colspan="8">Nenhum goleiro cadastrado.</td></tr>';
+}
+
+function renderCards(list, container) {
+  container.innerHTML = list.map((g,i) => {
+    const pct = list[0]?.pontos > 0 ? Math.min(100, g.pontos/list[0].pontos*100) : 0;
+    return `
+      <article class="player-card goalkeeper-card ${i<3 ? `top-${i+1}` : ""}">
+        <span class="player-rank">#${String(i+1).padStart(2,"0")}</span>
+        <a class="goalkeeper-photo-link" href="goleiro.html?id=${encodeURIComponent(g.id)}">
+          <img src="${esc(g.foto || "futponts_large.png")}" alt="Foto de ${esc(g.nome)}" loading="lazy" onerror="this.onerror=null;this.src='futponts_large.png'">
         </a>
-      </td>
-      <td><strong>${formatarPontos(g.pontos)}</strong></td>
-      <td>${g.vitorias}</td>
-      <td>${g.empate}</td>
-      <td>${g.gols}</td>
-      <td>${g.defesa}</td>
-      <td>${g.infracoes}</td>
-    </tr>
-  `).join("");
+        <h3 class="player-name"><a href="goleiro.html?id=${encodeURIComponent(g.id)}">${esc(g.nome)}</a></h3>
+        <strong class="player-points">${points(g.pontos)} pts</strong>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="player-stats">
+          <span>Vitórias: ${g.vitorias}</span><span>Jogos: ${g.jogos_disputados}</span>
+          <span>Defesas: ${g.defesa}</span><span>Gols: ${g.gols}</span>
+          <span>Sofridos: ${g.gols_sofridos}</span><span>Empates: ${g.empate}</span>
+        </div>
+        <a class="goalkeeper-profile-link" href="goleiro.html?id=${encodeURIComponent(g.id)}">Ver perfil completo →</a>
+      </article>`;
+  }).join("") || '<p class="empty-state">Nenhum goleiro cadastrado.</p>';
 }
 
-function renderCards(lista, container) {
-  container.innerHTML = "";
-
-  lista.forEach((g, i) => {
-    const stats = desempenhoJogadores[g.nome] || [0, 0, 0, 0, 0];
-    const media = stats.reduce((a, b) => a + b, 0) / 5;
-    const percentual = Math.min((g.pontos / (lista[0]?.pontos || 1)) * 100, 100);
-
-    const card = document.createElement("div");
-    card.className = "player-card";
-    card.style.display = "flex";
-    card.style.flexDirection = "column";
-    card.style.alignItems = "center";
-    card.style.padding = "20px";
-    card.style.position = "relative";
-
-    if (i === 0) card.classList.add("top-1");
-    if (i === 1) card.classList.add("top-2");
-    if (i === 2) card.classList.add("top-3");
-
-    const canvasId = `chart_goleiro_${i}`;
-
-    card.innerHTML = `
-      <div class="player-rank" style="position: absolute; top: 10px; left: 10px;">#${String(i + 1).padStart(2, "0")}</div>
-      <div class="media-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(214, 40, 40, 0.2); color: #ef3434; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">${media.toFixed(1)}</div>
-
-      <div class="player-name" style="margin-top: 10px; font-weight: bold; font-size: 1.1rem;">
-        <a href="jogador.html?id=${encodeURIComponent(String(g.id ?? ""))}" class="player-link">${esc(g.nome)}</a>
-      </div>
-
-      <canvas id="${canvasId}" style="max-width: 180px; margin: 15px 0;"></canvas>
-
-      <div class="player-points" style="font-size: 1.2rem; font-weight: bold; color: #ef3434;">
-        ${formatarPontos(g.pontos)} pts
-      </div>
-
-      <div class="progress-bar" style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 10px 0; overflow: hidden;">
-        <div class="progress-fill" data-target-width="${percentual}%" style="height: 100%; background: #ef3434; width: 0;"></div>
-      </div>
-
-      <div class="player-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; font-size: 0.8rem; opacity: 0.8;">
-        <span>Vit: ${g.vitorias}</span>
-        <span>Gols: ${g.gols}</span>
-        <span>Def: ${g.defesa}</span>
-        <span>Emp: ${g.empate}</span>
-      </div>
-    `;
-
-    container.appendChild(card);
-
-    const canvas = card.querySelector(`#${canvasId}`);
-    const ctx = canvas?.getContext("2d");
-    if (ctx && typeof window.Chart === "function") new window.Chart(ctx, {
-      type: "radar",
-      data: {
-        labels: ["Def", "Atq", "Hab", "Vel", "Pas"],
-        datasets: [{
-          data: stats,
-          borderColor: "#ef3434",
-          backgroundColor: "rgba(214, 40, 40, 0.2)",
-          borderWidth: 2,
-          pointRadius: 0
-        }]
-      },
-      options: radarOptions
-    });
-
-  });
-
-  animarEntradaGoleiros(container);
-}
-
-async function animarEntradaGoleiros(container) {
-  const barras = [...container.querySelectorAll(".progress-fill")];
-  const exibirBarras = () => {
-    barras.forEach(barra => {
-      barra.style.width = barra.dataset.targetWidth || "0%";
-    });
-  };
-
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-    exibirBarras();
-    return;
-  }
-
+async function load() {
+  const tbody = document.getElementById("tabela-goleiros");
+  const cards = document.getElementById("cards-goleiros");
   try {
-    const { animate, stagger } = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm");
-
-    animate(".section-header", {
-      opacity: [0, 1],
-      y: [10, 0],
-      duration: 420,
-      delay: stagger(90),
-      ease: "out(3)"
-    });
-
-    animate("#tabela-goleiros tr", {
-      opacity: [0, 1],
-      y: [8, 0],
-      duration: 380,
-      delay: stagger(35),
-      ease: "out(3)"
-    });
-
-    animate(container.querySelectorAll(".player-card"), {
-      opacity: [0, 1],
-      y: [18, 0],
-      scale: [0.97, 1],
-      duration: 520,
-      delay: stagger(55),
-      ease: "out(3)"
-    });
-
-    barras.forEach((barra, index) => {
-      animate(barra, {
-        width: barra.dataset.targetWidth || "0%",
-        duration: 850,
-        delay: 160 + Math.min(index, 12) * 35,
-        ease: "out(4)"
-      });
-    });
+    const list = normalize(await apiRequest(endpoint));
+    if (tbody) renderTable(list, tbody);
+    if (cards) renderCards(list, cards);
   } catch (error) {
-    console.warn("Anime.js não carregou; exibindo os dados sem animação.", error);
-    exibirBarras();
+    console.error("Erro ao carregar goleiros:", error);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8">Não foi possível carregar os goleiros.</td></tr>';
+    if (cards) cards.innerHTML = '<p class="empty-state">Não foi possível carregar os goleiros.</p>';
   }
 }
+
+document.addEventListener("DOMContentLoaded", load);
