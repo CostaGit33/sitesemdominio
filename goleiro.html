@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfil do Goleiro | FutPontos</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#07080D">
+  <link rel="icon" href="futponts_large.png" type="image/png">
+  <link rel="stylesheet" href="common-nav.css">
+  <link rel="stylesheet" href="jogador.css?v=60">
+  <link rel="stylesheet" href="ux-enhancements.css?v=1">
+  <link rel="stylesheet" href="ux-pages.css?v=1">
+  <style>
+    .goalkeeper-profile-photo{width:116px;height:116px;object-fit:cover;border-radius:50%;border:3px solid #ef3434}
+    .goalkeeper-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}
+    .goalkeeper-metric{padding:15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+    .goalkeeper-metric strong{display:block;font-size:1.35rem}
+    .goalkeeper-metric span{font-size:.78rem;opacity:.72}
+    .goalkeeper-history{display:grid;gap:8px}
+    .goalkeeper-history article{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px;border-radius:12px;background:rgba(255,255,255,.05)}
+  </style>
+</head>
+<body>
+  <header class="app-header profile-topbar">
+    <div class="brand"><img src="futponts_large.png" class="brand-logo" alt="FutPontos"></div>
+    <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="app-nav" aria-label="Navegação principal"><ul>
+      <li><a href="classificacao.html">Classificação</a></li>
+      <li><a href="jogador.html">Perfis</a></li>
+      <li><a href="goleiros.html" class="active">Goleiros</a></li>
+      <li><a href="desempenho.html">Desempenho</a></li>
+    </ul></nav>
+  </header>
+  <main class="player-page">
+    <div id="playerState" class="player-loading">Carregando perfil do goleiro...</div>
+    <section id="playerProfile" hidden></section>
+  </main>
+  <footer class="app-footer"><div class="footer-content"><span>© 2026 • FutPontos</span></div></footer>
+  <div id="feedback" aria-live="polite"></div>
+  <script type="module" src="./globais.js?v=57"></script>
+  <script src="menu.js?v=59"></script>
+  <script type="module" src="./goleiro.js?v=1"></script>
+</body>
+</html>
