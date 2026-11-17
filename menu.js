@@ -11,11 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMobile = () => window.matchMedia("(max-width: 800px)").matches;
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // O menu só apresenta destinos ativos no momento; páginas antigas permanecem no projeto.
+  // O menu apresenta apenas destinos ativos do aplicativo.
   if (appNav) {
     const ul = appNav.querySelector("ul");
     if (ul) {
-      ul.querySelectorAll('a[href="videos.html"], a[href="topo.html"], a[href="analise-semana.html"], a[href="montar-times.html"]')
+      ul.querySelectorAll('a[href="videos.html"], a[href="topo.html"], a[href="analise-semana.html"]')
         .forEach(link => link.closest("li")?.remove());
 
       if (!ul.querySelector('a[href="index.html"]')) {
