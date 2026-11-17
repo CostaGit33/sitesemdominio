@@ -17,7 +17,7 @@ A API atualmente consultada não apresenta contrato de login/autenticação. Por
 
 ## Áreas que aguardam confirmação dos contratos
 
-Goleiros, montagem de times e detalhes de competências não foram ligados a endpoints presumidos. Serão integrados após validar as rotas e seus formatos na API atual.
+As demais áreas serão integradas somente após validar as rotas e seus formatos na API atual.
 
 ## Executar
 
